@@ -44,8 +44,8 @@
     <button class="shop-btn">Shop Now</button>
   </div>
 
-  <button class="side-btn prev" onclick="changeHero(-1)">‹</button>
-  <button class="side-btn next" onclick="changeHero(1)">›</button>
+  <button class="side-btn prev" onclick="changeHero(-1)">></button>
+  <button class="side-btn next" onclick="changeHero(1)"><</button>
 </section>
 
 <!-- ===== Products ===== -->
@@ -149,6 +149,6 @@
   <p>© 2025 Wise Tech - All Rights Reserved</p>
 </footer>
 
-<script src="script.js"></script>
+<script src="assests/js/script.js"></script>
 </body>
 </html>
