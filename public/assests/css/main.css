@@ -50,33 +50,58 @@ body {
   color: #245bff;
   font-weight: 1000;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: transform 0.25s ease,box-shadow 0.25s ease;
 }
 
 .nav-links a:hover {
   background: #245bff;
   color: white;
+  transform: translateY(-6px);
   box-shadow: 0 6px 15px rgba(36, 91, 255, 0.35);
-  transform: translateY(-2px);
+  
 }
 
 .nav-icons {
   display: flex;
   gap: 15px;
 }
-
+.icon-box{
+  width: 44px;
+  height: 44px;
+  background-color: #f2f6fa;
+  color: #245bff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.25s ease,box-shadow 0.25s ease;
+}
+.icon-box i{
+  font-size: 18px;
+  line-height: 1;
+}
+.icon-box:hover{
+    background: #245bff;
+  color: white;
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
 .nav-icons span {
+  color: #245bff;
   background: rgba(32, 30, 197, 0.05);
   padding: 8px 10px;
   border-radius: 10px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.25s ease,box-shadow 0.25s ease;
 }
 
 .nav-icons span:hover {
   background: #245bff;
   color: white;
-  transform: scale(1.1);
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
 .menu {

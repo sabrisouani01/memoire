@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wise Tech - Next Generation</title>
   <link rel="stylesheet" href="./css/main.css" />
-
+  <link rel="stylesheet" href="./assests\css\main.css">
+  <script src="https://kit.fontawesome.com/4060ace190.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -23,19 +24,19 @@
     </nav>
 
     <div class="nav-icons">
-      <span>🔍</span>
-      <span>❤️</span>
-      <span>🛒</span>
-      <span>👤</span>
-      <span class="menu" id="menu">☰</span>
+      <a href="#" class="icon-box"><i class="fa-solid fa-magnifying-glass" ></i></a>
+      <a href="#" class="icon-box"><i class="fa-solid fa-heart" ></i></a>
+      <a href="#" class="icon-box"><i class="fa-solid fa-cart-shopping" ></i></a>
+      <a href=".\auth\login.php" class="icon-box"><i class="fa-solid fa-user" ></i></a>
+      <span class="menu" id="menu"><i class="fa-solid fa-bars "  ></i></span>
     </div>
   </div>
 </header>
 
 <!-- ===== Hero ===== -->
 <section class="hero" id="home">
-  <img src="uploads/photo_5922664454585781268_x.jpg" class="hero-img active" id="img1" />
-  <img src="uploads/photo_5922664454585781246_x.jpg" class="hero-img" id="img2" />
+  <img src="assests/uploads/photo_5922664454585781268_x.jpg" class="hero-img active" id="img1" />
+  <img src="assests/uploads/photo_5922664454585781246_x.jpg" class="hero-img" id="img2" />
 
   <div class="hero-overlay">
     <h1>أهلاً بك في Wise Tech</h1>
@@ -53,7 +54,7 @@
   <div class="products">
     <div class="product-card">
       <div class="product-top">
-        <img src="uploads/iphone.jpg" alt="iPhone" onclick="toggleDetails(this)" />
+        <img src="assests/uploads/iphone.jpg" alt="iPhone" onclick="toggleDetails(this)" />
         <div class="details">
           <p>📱 الرام: 4GB</p>
           <p>💾 السعة: 128GB</p>
@@ -70,7 +71,7 @@
 
     <div class="product-card">
       <div class="product-top">
-        <img src="uploads/samsung.jpg" alt="Samsung S24" onclick="toggleDetails(this)" />
+        <img src="assests/uploads/samsung.jpg" alt="Samsung S24" onclick="toggleDetails(this)" />
         <div class="details">
           <p>📱 الرام: 8GB</p>
           <p>💾 السعة: 256GB</p>
@@ -87,7 +88,7 @@
 
     <div class="product-card">
       <div class="product-top">
-        <img src="uploads/pixel.jpg" alt="Pixel 6" onclick="toggleDetails(this)" />
+        <img src="assests/uploads/pixel.jpg" alt="Pixel 6" onclick="toggleDetails(this)" />
         <div class="details">
           <p>📱 الرام: 6GB</p>
           <p>💾 السعة: 128GB</p>
@@ -104,7 +105,7 @@
 
     <div class="product-card">
       <div class="product-top">
-        <img src="uploads/Xiaomi.jpg" alt="Xiaomi Mi 11" onclick="toggleDetails(this)" />
+        <img src="assests/uploads/Xiaomi.jpg" alt="Xiaomi Mi 11" onclick="toggleDetails(this)" />
         <div class="details">
           <p>📱 الرام: 8GB</p>
           <p>💾 السعة: 256GB</p>
