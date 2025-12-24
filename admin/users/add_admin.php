@@ -5,8 +5,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-include "../../includes/db_connect.php";
-$lang = include "../../languages/ar.php"; // Use your language system
+include "../../include/db_connect.php";// Use your language system
 
 $message = '';
 
@@ -77,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a href="../orders/index.php">الطلبات</a>
         <a href="../customers/index.php">العملاء</a>
         <a href="add_admin.php" class="active">➕ إضافة مدير</a>
-        <a href="../logout.php">تسجيل الخروج</a>
+        <a href="../../auth/logout.php">تسجيل الخروج</a>
     </div>
 
     <div class="content">
