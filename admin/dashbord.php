@@ -32,7 +32,7 @@ $count_customers = $stmt->fetch()['total'];
 <head>
     <meta charset="UTF-8">
     <title>📊 لوحة التحكم</title>
-   <link rel="stylesheet" href="../assets/css/admin_dashboard.css">
+   <link rel="stylesheet" href="../assests/css/admin_dashboard.css">
 </head>
 <body>
     <!-- Sidebar -->

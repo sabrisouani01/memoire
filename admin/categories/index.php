@@ -24,7 +24,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <title>🗂️ التصنيفات</title>
-    <link rel="stylesheet" href="../../assets/CSS/categories.css">
+    <link rel="stylesheet" href="../../assests/CSS/categories.css">
    
 </head>
 <body class="p-4">

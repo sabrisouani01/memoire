@@ -1,14 +1,16 @@
-<?php  include "include/db_connect.php"; ?>
- 
+<?php
+// الاتصال بقاعدة البيانات (PDO)
+include "include/db_connect.php";
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wise Tech - Next Generation</title>
+
   <link rel="stylesheet" href="./css/main.css" />
   <link rel="stylesheet" href="./assests/css/main.css">
- 
 </head>
 <body>
 
@@ -26,11 +28,11 @@
     </nav>
 
     <div class="nav-icons">
-      <a href="#" class="icon-box"><i class="fa-solid fa-magnifying-glass" ></i></a>
-      <a href="#" class="icon-box"><i class="fa-solid fa-heart" ></i></a>
-      <a href="#" class="icon-box"><i class="fa-solid fa-cart-shopping" ></i></a>
-      <a href=".\auth\login.php" class="icon-box"><i class="fa-solid fa-user" ></i></a>
-      <span class="menu" id="menu"><i class="fa-solid fa-bars "  ></i></span>
+      <a href="#" class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></a>
+      <a href="#" class="icon-box"><i class="fa-solid fa-heart"></i></a>
+      <a href="#" class="icon-box"><i class="fa-solid fa-cart-shopping"></i></a>
+      <a href="./auth/login.php" class="icon-box"><i class="fa-solid fa-user"></i></a>
+      <span class="menu" id="menu"><i class="fa-solid fa-bars"></i></span>
     </div>
   </div>
 </header>
@@ -50,34 +52,41 @@
   <button class="side-btn next" onclick="changeHero(1)"><</button>
 </section>
 
-<!-- ===== Products (Dynamic) ===== -->
+<!-- ===== Products (Dynamic / PDO) ===== -->
 <section class="products-section" id="products">
   <h2 class="section-title">🔥 Our Products</h2>
 
   <div class="products">
     <?php
       $sql = "SELECT * FROM products ORDER BY created_at DESC";
-      $result = $conn->query($sql);
+      $stmt = $pdo->query($sql);
+      $products = $stmt->fetchAll();
 
-      if ($result->num_rows > 0):
-        while ($row = $result->fetch_assoc()):
+      if (count($products) > 0):
+        foreach ($products as $row):
     ?>
     <div class="product-card">
       <div class="product-top">
-        <img src="assests/uploads/<?php echo $row['image_url']; ?>" onclick="toggleDetails(this)" />
+        <img
+          src="assests/uploads/<?php echo htmlspecialchars($row['image_url']); ?>"
+          onclick="toggleDetails(this)"
+          alt="<?php echo htmlspecialchars($row['name_ar']); ?>"
+        />
         <div class="details">
-          <p><?php echo $row['description_ar']; ?></p>
+          <p><?php echo htmlspecialchars($row['description_ar']); ?></p>
         </div>
       </div>
 
       <div class="product-bottom">
-        <h3><?php echo $row['name_ar']; ?></h3>
-        <p class="price"><?php echo number_format($row['price'], 2); ?> دج</p>
+        <h3><?php echo htmlspecialchars($row['name_ar']); ?></h3>
+        <p class="price">
+          <?php echo number_format($row['price'], 2); ?> دج
+        </p>
         <button class="buy-btn">شراء</button>
       </div>
     </div>
     <?php
-        endwhile;
+        endforeach;
       else:
     ?>
       <p style="text-align:center;">لا توجد منتجات حاليا</p>
@@ -89,6 +98,7 @@
 <section class="warranty-conditions" id="warranty">
   <h2 class="warranty-title">شروط الضمان الأساسية</h2>
   <div class="title-line"></div>
+
   <div class="conditions-container">
     <div class="condition-card">
       <div class="condition-number">1</div>
@@ -97,11 +107,15 @@
         <p>العلبة، الحماية الداخلية، الملصقات والملحقات يُعد شرطًا أساسيًا للاستفادة من الضمان.</p>
       </div>
     </div>
+
     <div class="condition-card">
       <div class="condition-number">2</div>
       <div class="condition-content">
         <h3>الضمان لا يشمل استرجاع المبلغ</h3>
-        <p>الضمان لا يمنح الزبون الحق في استرجاع المبلغ المدفوع تحت أي ظرف. في حال وجود عطل، تلتزم الشركة بإصلاح الخلل أو استبدال القطعة التالفة فقط.</p>
+        <p>
+          الضمان لا يمنح الزبون الحق في استرجاع المبلغ المدفوع.
+          في حال وجود عطل، يتم الإصلاح أو الاستبدال فقط.
+        </p>
       </div>
     </div>
   </div>

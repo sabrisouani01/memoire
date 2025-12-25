@@ -23,7 +23,7 @@ $technicians = $pdo->query($sql)->fetchAll();
 <head>
     <meta charset="UTF-8">
     <title>🔧 الفنيون</title>
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assests/css/admin.css">
 </head>
 <body>
     <div class="sidebar">
