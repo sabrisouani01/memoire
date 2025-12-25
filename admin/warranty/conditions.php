@@ -1,5 +1,5 @@
 <?php
-include("../../includes/conn.php");
+include("../../include/conn.php");
 
 
 // جلب الشروط

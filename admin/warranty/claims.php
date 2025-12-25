@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-include "../../includes/db_connect.php";
+include "../../include/db_connect.php";
 
 $claims = $pdo->query("
     SELECT r.*, u.username, u.phone, p.name_ar, c.name_ar AS cat_name 

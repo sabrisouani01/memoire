@@ -1,5 +1,5 @@
 <?php
-include("../../includes/db_connect.php");
+include("../../include/db_connect.php");
 
 // نجيب المبيعات من جدول orders
 $sql = "SELECT id, total_amount, status, created_at FROM orders ORDER BY created_at DESC";
