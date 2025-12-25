@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-include "../../includes/db_connect.php";
+include "../../include/db_connect.php";
 
 if ($_POST['add'] ?? null) {
     $cat = (int)$_POST['category_id'];
@@ -33,7 +33,7 @@ $categories = $pdo->query("SELECT id, name_ar FROM categories")->fetchAll();
 <html lang="ar" dir="rtl">
 <head>
     <title>⚖️ قواعد الضمان</title>
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assests/css/admin.css">
 </head>
 <body>
     <div class="sidebar">

@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-include "../../includes/db_connect.php";
+include "../../include/db_connect.php";
 
 // Get all technicians and count their repairs
 $sql = "SELECT u.username, u.First_name, u.Last_name, u.phone,
@@ -23,7 +23,7 @@ $technicians = $pdo->query($sql)->fetchAll();
 <head>
     <meta charset="UTF-8">
     <title>🔧 الفنيون</title>
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assests/css/admin.css">
 </head>
 <body>
     <div class="sidebar">

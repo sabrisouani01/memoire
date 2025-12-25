@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-include "../../includes/db_connect.php";
+include "../../include/db_connect.php";
 
 // Get admin username
 $username = htmlspecialchars($_SESSION['username']);
@@ -34,7 +34,7 @@ if ($customer_id) {
 <head>
     <meta charset="UTF-8">
     <title>👥 العملاء</title>
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assests/css/admin.css">
 </head>
 <body>
     <!-- Sidebar -->

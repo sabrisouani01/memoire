@@ -1,6 +1,6 @@
 <?php
 // Include database connection
-include "../../includes/db_connect.php";
+include "../../include/db_connect.php";
 
 // Get and validate ID
 $id = $_GET['id'] ?? null;
@@ -26,7 +26,7 @@ try {
     // Optional: Delete image file from server
     $image_url = $product['image_url'];
     if ($image_url) {
-        $image_path = "../../assets/uploads/" . basename($image_url);
+        $image_path = "../../assests/uploads/" . basename($image_url);
         if (file_exists($image_path)) {
             unlink($image_path); // Remove file
         }

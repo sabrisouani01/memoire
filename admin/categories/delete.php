@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-include "../../includes/db_connect.php";
+include "../../include/db_connect.php";
 
 $id = $_GET['id'] ?? null;
 

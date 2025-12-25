@@ -1,5 +1,5 @@
 <?php
-include("../../includes/conn.php");
+include("../../include/conn.php");
 
 // نجيب المنتجات من جدول products
 $query = "SELECT id, name, stock, price, created_at FROM products ORDER BY created_at DESC";
@@ -10,7 +10,7 @@ $result = mysqli_query($conn, $query);
 <head>
   <meta charset="UTF-8">
   <title>تقرير المخزون</title>
-  <link rel="stylesheet" href="../../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../assests/css/bootstrap.min.css">
 </head>
 <body class="p-4">
 

@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-include "../../includes/db_connect.php";
+include "../../include/db_connect.php";
 
 // Get admin username
 $username = htmlspecialchars($_SESSION['username']);
@@ -24,7 +24,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <title>🗂️ التصنيفات</title>
-    <link rel="stylesheet" href="../../assets/CSS/categories.css">
+    <link rel="stylesheet" href="../../assests/CSS/categories.css">
    
 </head>
 <body class="p-4">

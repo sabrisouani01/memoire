@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-include "../../includes/db_connect.php";
+include "../../include/db_connect.php";
 
 $claims = $pdo->query("
     SELECT r.*, u.username, u.phone, p.name_ar, c.name_ar AS cat_name 
@@ -23,7 +23,7 @@ $technicians = $pdo->query("SELECT username, First_name, Last_name FROM users WH
 <html lang="ar" dir="rtl">
 <head>
     <title>🛡️ مطالبات الضمان</title>
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assests/css/admin.css">
 </head>
 <body>
     <div class="sidebar">

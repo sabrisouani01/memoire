@@ -213,15 +213,6 @@ CREATE TABLE `users` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `First_name`, `Last_name`, `phone`, `address`, `role`, `token_expire`, `reset_token`, `created_at`, `updated_at`) VALUES
-(2, 'admin2', 'admin2@wisetech.dz', '$2y$10$N7xX4eDkzF0vJqRm9sT1ueGJ5bW3nQ8rY6pL2oI1jK4mN7qR9tUvw', 'Admin', 'User', NULL, NULL, 'admin', NULL, NULL, '2025-12-24 10:00:00', '2025-12-24 10:00:00'),
-(6, 'DJABER', 'abougamerxgamer444@gmail.com', '$2y$10$WqzvDzvfDxrimEGLVZqFOeyIQtfyWwAahb95XZUHKmL76LweFfqhW', 'DJABER', 'abdderahmane', NULL, NULL, 'admin', NULL, NULL, '2025-08-28 09:03:34', '2025-08-28 09:03:34'),
-(7, 'djb', 'genabdou21@gmail.com', '$2y$10$L1pPzdpvk/1fVlsQ3LhFh.hLf7QkMuXM7.bjtQSdsJjcVcunOrCMq', 'djbdjoub', 'Abd', NULL, NULL, 'admin', NULL, NULL, '2025-08-28 09:05:57', '2025-08-28 09:05:57'),
-(8, 'riad', 'abdou210crazyboy@gmail.com', '$2y$10$dM0OjT8Wno6D5CBb7E1ozOVUGrOxP.530.OVGEWZTLXmUx2bUyK2i', 'djbdjoub', 'sexmaster', '0696788970', NULL, 'technician', NULL, NULL, '2025-08-28 19:18:33', '2025-08-28 19:18:33');
 
 
 -- --------------------------------------------------------

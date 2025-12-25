@@ -1,5 +1,5 @@
 <?php
-include("../../includes/db_connect.php");
+include("../../include/db_connect.php");
 
 // نجيب المبيعات من جدول orders
 $sql = "SELECT id, total_amount, status, created_at FROM orders ORDER BY created_at DESC";
@@ -12,7 +12,7 @@ $sales = $stmt->fetchAll();
 <head>
   <meta charset="UTF-8">
   <title>تقرير المبيعات</title>
-  <link rel="stylesheet" href="../../assets/css/admin.css">
+  <link rel="stylesheet" href="../../assests/css/admin.css">
 </head>
 <body class="p-4">
   <!-- Sidebar -->

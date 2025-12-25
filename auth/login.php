@@ -1,6 +1,6 @@
 <?php
 session_start();
-include "../includes/db_connect.php";
+include "../include/db_connect.php";
 
 $message = '';
 
@@ -38,7 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     } elseif ($user['role'] === 'technician') {
                         header("Location: ../technician/panel.php");
                     } else {
+
                         header("Location: ../client/index.php");
+
                     }
                     exit;
                 }

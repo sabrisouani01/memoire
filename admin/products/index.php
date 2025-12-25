@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-include "../../includes/db_connect.php";
+include "../../include/db_connect.php";
 
 // Get admin username
 $username = htmlspecialchars($_SESSION['username']);
@@ -27,8 +27,8 @@ try {
 <head>
     <meta charset="UTF-8">
     <title>📦 المنتجات</title>
-    <link rel="stylesheet" href="../../assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assests/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../assests/css/admin.css">
 </head>
 <body class="p-4">
     <!-- Sidebar -->
@@ -94,7 +94,7 @@ try {
                             </td>
                             <td>
                                 <?php if (!empty($row['image_url'])): ?>
-                                    <img src="../../assets/uploads/<?= htmlspecialchars(basename($row['image_url'])); ?>" width="80">
+                                    <img src="../../assests/uploads/<?= htmlspecialchars(basename($row['image_url'])); ?>" width="80">
                                 <?php else: ?>
                                     <span class="text-muted">لا صورة</span>
                                 <?php endif; ?>
@@ -121,6 +121,6 @@ try {
         </table>
     </div>
 
-    <script src="../../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assests/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
