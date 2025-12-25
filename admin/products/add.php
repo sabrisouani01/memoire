@@ -1,5 +1,5 @@
 <?php
-include "../../includes/db_connect.php";
+include "../../include/db_connect.php";
 
 $error = null;
 

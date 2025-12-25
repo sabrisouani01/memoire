@@ -1,6 +1,6 @@
 <?php
 // Include database connection
-include "../../includes/db_connect.php";
+include "../../include/db_connect.php";
 
 // Get and validate ID
 $id = $_GET['id'] ?? null;

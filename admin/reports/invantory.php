@@ -1,5 +1,5 @@
 <?php
-include("../../includes/conn.php");
+include("../../include/conn.php");
 
 // نجيب المنتجات من جدول products
 $query = "SELECT id, name, stock, price, created_at FROM products ORDER BY created_at DESC";

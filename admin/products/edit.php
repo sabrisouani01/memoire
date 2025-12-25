@@ -1,5 +1,5 @@
 <?php
-include "../../includes/db_connect.php";
+include "../../include/db_connect.php";
 
 $id = $_GET['id'] ?? null;
 if (!$id || !is_numeric($id)) die("ID غير صالح.");

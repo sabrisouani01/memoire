@@ -1,3 +1,5 @@
+<?php  include "include/db_connect.php"; ?>
+ 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -5,8 +7,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wise Tech - Next Generation</title>
   <link rel="stylesheet" href="./css/main.css" />
-  <link rel="stylesheet" href="./assests\css\main.css">
-  <script src="https://kit.fontawesome.com/4060ace190.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="./assests/css/main.css">
+ 
 </head>
 <body>
 
@@ -48,77 +50,38 @@
   <button class="side-btn next" onclick="changeHero(1)"><</button>
 </section>
 
-<!-- ===== Products ===== -->
+<!-- ===== Products (Dynamic) ===== -->
 <section class="products-section" id="products">
   <h2 class="section-title">🔥 Our Products</h2>
+
   <div class="products">
-    <div class="product-card">
-      <div class="product-top">
-        <img src="assests/uploads/iphone.jpg" alt="iPhone" onclick="toggleDetails(this)" />
-        <div class="details">
-          <p>📱 الرام: 4GB</p>
-          <p>💾 السعة: 128GB</p>
-          <p>📷 الكاميرا: 12MP</p>
-          <p>🔋 البطارية: 3110mAh</p>
-        </div>
-      </div>
-      <div class="product-bottom">
-        <h3>iPhone 11</h3>
-        <p class="price">80000 دج</p>
-        <button class="buy-btn">شراء</button>
-      </div>
-    </div>
+    <?php
+      $sql = "SELECT * FROM products ORDER BY created_at DESC";
+      $result = $conn->query($sql);
 
+      if ($result->num_rows > 0):
+        while ($row = $result->fetch_assoc()):
+    ?>
     <div class="product-card">
       <div class="product-top">
-        <img src="assests/uploads/samsung.jpg" alt="Samsung S24" onclick="toggleDetails(this)" />
+        <img src="assests/uploads/<?php echo $row['image_url']; ?>" onclick="toggleDetails(this)" />
         <div class="details">
-          <p>📱 الرام: 8GB</p>
-          <p>💾 السعة: 256GB</p>
-          <p>📷 الكاميرا: 50MP</p>
-          <p>🔋 البطارية: 4000mAh</p>
+          <p><?php echo $row['description_ar']; ?></p>
         </div>
       </div>
-      <div class="product-bottom">
-        <h3>Samsung Galaxy S24</h3>
-        <p class="price">90000 دج</p>
-        <button class="buy-btn">شراء</button>
-      </div>
-    </div>
 
-    <div class="product-card">
-      <div class="product-top">
-        <img src="assests/uploads/pixel.jpg" alt="Pixel 6" onclick="toggleDetails(this)" />
-        <div class="details">
-          <p>📱 الرام: 6GB</p>
-          <p>💾 السعة: 128GB</p>
-          <p>📷 الكاميرا: 50MP</p>
-          <p>🔋 البطارية: 4614mAh</p>
-        </div>
-      </div>
       <div class="product-bottom">
-        <h3>Pixel 6</h3>
-        <p class="price">25000 دج</p>
+        <h3><?php echo $row['name_ar']; ?></h3>
+        <p class="price"><?php echo number_format($row['price'], 2); ?> دج</p>
         <button class="buy-btn">شراء</button>
       </div>
     </div>
-
-    <div class="product-card">
-      <div class="product-top">
-        <img src="assests/uploads/Xiaomi.jpg" alt="Xiaomi Mi 11" onclick="toggleDetails(this)" />
-        <div class="details">
-          <p>📱 الرام: 8GB</p>
-          <p>💾 السعة: 256GB</p>
-          <p>📷 الكاميرا: 108MP</p>
-          <p>🔋 البطارية: 4600mAh</p>
-        </div>
-      </div>
-      <div class="product-bottom">
-        <h3>Xiaomi Mi 11</h3>
-        <p class="price">70000 دج</p>
-        <button class="buy-btn">شراء</button>
-      </div>
-    </div>
+    <?php
+        endwhile;
+      else:
+    ?>
+      <p style="text-align:center;">لا توجد منتجات حاليا</p>
+    <?php endif; ?>
   </div>
 </section>
 
@@ -131,7 +94,7 @@
       <div class="condition-number">1</div>
       <div class="condition-content">
         <h3>الاحتفاظ بالتغليف الأصلي الكامل</h3>
-        <p>العلبة، الحماية الداخلية، الملصقات والملحقات يُعد شرطًا أساسيًا من الشركات العالمية الموزعة مثل MSI للاستفادة من الضمان.</p>
+        <p>العلبة، الحماية الداخلية، الملصقات والملحقات يُعد شرطًا أساسيًا للاستفادة من الضمان.</p>
       </div>
     </div>
     <div class="condition-card">
