@@ -146,7 +146,7 @@ elseif ($action === 'register') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wise Tech - Next Generation</title>
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="logins.css">
     <script src="https://kit.fontawesome.com/4060ace190.js" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -280,6 +280,6 @@ elseif ($action === 'register') {
 </div>
 
     </div>
-    <script src="login.js"></script>
+    <script src="logins.js"></script>
 </body>
 </html>
