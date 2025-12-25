@@ -10,7 +10,7 @@ $result = mysqli_query($conn, "SELECT * FROM conditions");
 <head>
   <meta charset="UTF-8">
   <title>⚖️ شروط الضمان</title>
-  <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../assests/css/bootstrap.min.css">
 </head>
 <body class="p-4">
 

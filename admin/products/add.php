@@ -18,7 +18,7 @@ if (isset($_POST['save'])) {
         $image = null;
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
             $image = time() . "_" . basename($_FILES['image']['name']);
-            $uploadDir = "../../assets/uploads/";
+            $uploadDir = "../../assests/uploads/";
             if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
             move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $image);
         }
