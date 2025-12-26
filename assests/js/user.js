@@ -63,10 +63,36 @@ if (searchModal) {
 }
 
 // Search form (demo)
-document.getElementById("search-form")?.addEventListener("submit", (e) => {
+document.getElementById("search-form")?.addEventListener("submit", function(e) {
   e.preventDefault();
-  alert("تم تنفيذ البحث! (قيد التطوير)");
+  
+  const searchTerm = document.getElementById("search-term")?.value.toLowerCase() || '';
+  const categoryFilter = document.getElementById("category-filter")?.value || '';
+  const minPrice = parseFloat(document.getElementById("min-price")?.value) || 0;
+  const maxPrice = parseFloat(document.getElementById("max-price")?.value) || Infinity;
+
+  // Hide modal
   document.getElementById("search-modal").style.display = "none";
+
+  // Get all product cards
+  const productCards = document.querySelectorAll(".product-card");
+
+  productCards.forEach(card => {
+    const name = card.querySelector('h3')?.textContent.toLowerCase() || '';
+    const priceText = card.querySelector('.price')?.textContent || '0';
+    const price = parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
+    const category = card.dataset.category || ''; // We'll add this in PHP
+
+    const matchesSearch = name.includes(searchTerm);
+    const matchesCategory = !categoryFilter || category === categoryFilter;
+    const matchesPrice = price >= minPrice && price <= maxPrice;
+
+    if (matchesSearch && matchesCategory && matchesPrice) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
 });
 
 // ✅ FIXED: Orders & Repairs links - Corrected paths

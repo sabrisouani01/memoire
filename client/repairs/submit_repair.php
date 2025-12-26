@@ -18,7 +18,7 @@ if (!$product_id || !$description) {
     die("يرجى تعبئة جميع الحقول.");
 }
 
-require_once '../../includes/db_connect.php';
+require_once '../../include/db_connect.php';
 
 // Verify that this user actually bought this product and it's under warranty
 $check = $pdo->prepare("

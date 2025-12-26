@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-require_once '../../includes/db_connect.php';
+require_once '../../include/db_connect.php';
 
 $user_id = $_SESSION['user_id'];
 
@@ -187,6 +187,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <div class="actions">
             <a href="../repairs/index.php" class="btn">طلب صيانة ضمن الضمان</a>
+            <a href="../index.php" class="btn">العودة</a>
             <a href="../auth/logout.php" class="btn logout">تسجيل الخروج</a>
         </div>
     </div>
