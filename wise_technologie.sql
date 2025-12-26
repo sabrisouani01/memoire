@@ -138,7 +138,7 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name_ar`, `name_fr`, `name_en`, `description_ar`, `description_fr`, `description_en`, `price`, `image_url`, `category_id`, `stock_quantity`, `is_active`, `created_at`) VALUES
-(4, 'djinger', '', 'ada', 'sex', NULL, 'sex', 1500.00, '1756370373_Screenshot_3.png', 2, 999, 1, '2025-08-28 08:39:33');
+(4, 'djinger', '', 'ada', 'hhhhh', NULL, 'hhhhhh', 1500.00, 'assests/uploads/Xiaomi.jpg', 2, 999, 1, '2025-08-28 08:39:33');
 
 -- --------------------------------------------------------
 

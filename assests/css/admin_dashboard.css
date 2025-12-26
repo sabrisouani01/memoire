@@ -1,0 +1,162 @@
+/* ================= RESET ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
+body {
+    background: #f4f6f9;
+    color: #333;
+    direction: rtl;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 250px;
+    height: 100vh;
+    background: #1e1e2f;
+    padding: 20px 15px;
+    overflow-y: auto;
+}
+
+.sidebar h4 {
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+.sidebar .admin-name {
+    color: #cfd2dc;
+    text-align: center;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.sidebar hr {
+    border: none;
+    border-top: 1px solid #3a3a55;
+    margin: 10px 0;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #cfd2dc;
+    text-decoration: none;
+    padding: 12px 10px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: all 0.3s ease;
+    font-size: 15px;
+}
+
+.sidebar a i {
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar a:hover {
+    background: #343454;
+    color: #ffffff;
+}
+
+.sidebar a.active {
+    background: #4e73df;
+    color: #ffffff;
+}
+
+.sidebar a.logout {
+    margin-top: 20px;
+    background: #dc3545;
+    color: #fff;
+}
+
+.sidebar a.logout:hover {
+    background: #b02a37;
+}
+
+/* ================= MAIN CONTENT ================= */
+.content {
+    margin-right: 270px;
+    padding: 25px;
+}
+
+.content h2 {
+    margin-bottom: 25px;
+    font-size: 26px;
+    color: #1e1e2f;
+}
+
+/* ================= GRID ================= */
+.row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.col-md-3 {
+    flex: 1;
+    min-width: 220px;
+}
+
+/* ================= CARDS ================= */
+.card {
+    border-radius: 12px;
+    padding: 20px;
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-body {
+    text-align: center;
+}
+
+.card-body i {
+    margin-bottom: 10px;
+}
+
+.card-body h5 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.card-body p {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* ================= CARD COLORS ================= */
+.bg-primary {
+    background: linear-gradient(135deg, #4e73df, #224abe);
+}
+
+.bg-warning {
+    background: linear-gradient(135deg, #f6c23e, #dda20a);
+}
+
+.bg-danger {
+    background: linear-gradient(135deg, #e74a3b, #be2617);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+    }
+
+    .content {
+        margin-right: 210px;
+    }
+}

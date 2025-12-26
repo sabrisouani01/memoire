@@ -33,6 +33,8 @@ $count_customers = $stmt->fetch()['total'];
     <meta charset="UTF-8">
     <title>📊 لوحة التحكم</title>
    <link rel="stylesheet" href="../assets/css/admin_dashboard.css">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 </head>
 <body>
     <!-- Sidebar -->

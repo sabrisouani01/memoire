@@ -1,5 +1,4 @@
-<?php  include "include/db_connect.php"; ?>
- 
+<?php require "include/db_connect.php"; ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -8,11 +7,10 @@
   <title>Wise Tech - Next Generation</title>
   <link rel="stylesheet" href="./css/main.css" />
   <link rel="stylesheet" href="./assests/css/main.css">
- 
+  <script src="https://kit.fontawesome.com/4060ace190.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
-<!-- ===== Navbar ===== -->
 <header class="top-header">
   <div class="nav-container">
     <div class="logo">
@@ -35,7 +33,6 @@
   </div>
 </header>
 
-<!-- ===== Hero ===== -->
 <section class="hero" id="home">
   <img src="assests/uploads/photo_5922664454585781268_x.jpg" class="hero-img active" id="img1" />
   <img src="assests/uploads/photo_5922664454585781246_x.jpg" class="hero-img" id="img2" />
@@ -50,17 +47,19 @@
   <button class="side-btn next" onclick="changeHero(1)"><</button>
 </section>
 
-<!-- ===== Products (Dynamic) ===== -->
 <section class="products-section" id="products">
   <h2 class="section-title">🔥 Our Products</h2>
 
   <div class="products">
     <?php
+      // 1. PDO Query
       $sql = "SELECT * FROM products ORDER BY created_at DESC";
-      $result = $conn->query($sql);
+      $stmt = $pdo->query($sql);
 
-      if ($result->num_rows > 0):
-        while ($row = $result->fetch_assoc()):
+      // 2. PDO Row Count
+      if ($stmt->rowCount() > 0):
+        // 3. PDO Fetch (Default is FETCH_ASSOC based on your db_connect.php)
+        while ($row = $stmt->fetch()):
     ?>
     <div class="product-card">
       <div class="product-top">
@@ -85,7 +84,6 @@
   </div>
 </section>
 
-<!-- ===== Warranty ===== -->
 <section class="warranty-conditions" id="warranty">
   <h2 class="warranty-title">شروط الضمان الأساسية</h2>
   <div class="title-line"></div>
@@ -107,7 +105,6 @@
   </div>
 </section>
 
-<!-- ===== Footer ===== -->
 <footer class="footer">
   <p>© 2025 Wise Tech - All Rights Reserved</p>
 </footer>

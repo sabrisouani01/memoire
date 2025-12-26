@@ -126,8 +126,8 @@ elseif ($action === 'register') {
     WHERE id = ?
 ");
                     $stmt->execute([$token, $user['id']]);
-
-                    // TODO: Send email with reset link
+                     $resetlink = "http://localhost/memoire/auth/reset_password.php?token=$token";
+                    //Send email with reset link
                     // Example: https://yourdomain.com/reset_password.php?token=$token
                     $message = "A password reset link has been sent to your email.";
                 }

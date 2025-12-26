@@ -26,7 +26,7 @@ if (isset($_POST['update'])) {
         $image = $product['image_url'];
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
             $image = time() . "_" . basename($_FILES['image']['name']);
-            $path = "../../assets/uploads/" . $image;
+            $path = "../../assests/uploads/" . $image;
             move_uploaded_file($_FILES['image']['tmp_name'], $path);
         }
 

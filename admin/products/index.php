@@ -51,7 +51,7 @@ try {
         <a href="index.php" >التصنيفات</a>
         <a href="../repairs/index.php">🛠️ الإصلاحات</a>
         <!-- Logout Button -->
-        <a href="../auth/logout.php" class="logout">
+        <a href="../../auth/logout.php" class="logout">
             🔐 تسجيل الخروج
         </a>
     </div>
@@ -94,7 +94,7 @@ try {
                             </td>
                             <td>
                                 <?php if (!empty($row['image_url'])): ?>
-                                    <img src="../../assets/uploads/<?= htmlspecialchars(basename($row['image_url'])); ?>" width="80">
+                                    <img src="../../assests/uploads/<?= htmlspecialchars(basename($row['image_url'])); ?>" width="80">
                                 <?php else: ?>
                                     <span class="text-muted">لا صورة</span>
                                 <?php endif; ?>
