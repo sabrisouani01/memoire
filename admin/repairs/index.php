@@ -27,7 +27,7 @@ $repairs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <title>🛠️ الإصلاحات</title>
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assests/css/admin.css">
 </head>
 <body>
     <!-- Sidebar -->

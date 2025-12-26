@@ -33,7 +33,7 @@ $categories = $pdo->query("SELECT id, name_ar FROM categories")->fetchAll();
 <html lang="ar" dir="rtl">
 <head>
     <title>⚖️ قواعد الضمان</title>
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assests/css/admin.css">
 </head>
 <body>
     <div class="sidebar">

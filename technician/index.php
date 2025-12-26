@@ -1,10 +1,5 @@
 <?php
-session_start();
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: ../../auth/login.php");
-    exit;
-}
-
+require "../includes/admin_auth.php";
 include "../../include/db_connect.php";
 
 // Get all technicians and count their repairs
@@ -23,7 +18,7 @@ $technicians = $pdo->query($sql)->fetchAll();
 <head>
     <meta charset="UTF-8">
     <title>🔧 الفنيون</title>
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assests/css/admin.css">
 </head>
 <body>
     <div class="sidebar">

@@ -34,7 +34,7 @@ if ($customer_id) {
 <head>
     <meta charset="UTF-8">
     <title>👥 العملاء</title>
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assests/css/admin.css">
 </head>
 <body>
     <!-- Sidebar -->

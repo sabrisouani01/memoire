@@ -23,7 +23,8 @@ $technicians = $pdo->query("SELECT username, First_name, Last_name FROM users WH
 <html lang="ar" dir="rtl">
 <head>
     <title>🛡️ مطالبات الضمان</title>
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assests/css/admin.css">
+    <link rel="stylesheet" href="../../assests/css/admin_dashboard.css">
 </head>
 <body>
     <div class="sidebar">

@@ -48,7 +48,7 @@ if (isset($_POST['update'])) {
     <meta charset="UTF-8">
     <title>✏️ تعديل منتج</title>
     <!-- Link to external CSS -->
-    <link rel="stylesheet" href="../../assets/css/edit-product.css">
+    <link rel="stylesheet" href="../../assests/css/edit-product.css">
 </head>
 <body>
     <div class="container">
@@ -127,7 +127,7 @@ if (isset($_POST['update'])) {
             <div class="form-group">
                 <label class="form-label">الصورة الحالية</label><br>
                 <?php if ($product['image_url']): ?>
-                    <img src="../../assets/uploads/<?= htmlspecialchars(basename($product['image_url'])) ?>" width="100" alt="Current Image">
+                    <img src="../../assests/uploads/<?= htmlspecialchars(basename($product['image_url'])) ?>" width="100" alt="Current Image">
                 <?php else: ?>
                     <span class="text-muted">لا صورة</span>
                 <?php endif; ?>

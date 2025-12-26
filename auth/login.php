@@ -34,11 +34,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['profile_image'] = $user['profile_image'] ?? 'default.jpg';
 
                     if ($user['role'] === 'admin') {
-                        header("Location: ../admin/dashbord.php");
+                        header("Location: ../admin/layout.php");
                     } elseif ($user['role'] === 'technician') {
-                        header("Location: ../technician/panel.php");
+                        header("Location: ../technician/index.php");
                     } else {
-                        header("Location: ../index.php");
+
+                        header("Location: ../client/index.php");
+
                     }
                     exit;
                 }
@@ -141,7 +143,7 @@ elseif ($action === 'register') {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang = "en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
