@@ -23,7 +23,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
 
-<!-- ===== Navbar ===== -->
 <header class="top-header">
   <div class="nav-container">
     <div class="logo">
@@ -92,8 +91,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <button class="shop-btn">Shop Now</button>
   </div>
 
-  <button class="side-btn prev" onclick="changeHero(-1)">></button>
-  <button class="side-btn next" onclick="changeHero(1)"><</button>
+  <button class="side-btn prev" onclick="changeHero(-1)"><</button>
+  <button class="side-btn next" onclick="changeHero(1)">></button>
 </section>
 
 <!-- ===== Products ===== -->
@@ -126,7 +125,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </div>
 </section>
 
-<!-- ===== Warranty ===== -->
 <section class="warranty-conditions" id="warranty">
   <h2 class="warranty-title">شروط الضمان الأساسية</h2>
   <div class="title-line"></div>
@@ -148,7 +146,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </div>
 </section>
 
-<!-- ===== Footer ===== -->
 <footer class="footer">
   <p>© 2025 Wise Tech - جميع الحقوق محفوظة</p>
 </footer>

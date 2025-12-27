@@ -1,6 +1,6 @@
 <?php
 require "../includes/admin_auth.php";
-include "../../include/db_connect.php";// Use your language system
+include "../../include/db_connect.php";
 $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']);
 $message = '';
 
@@ -15,8 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $password1 = $_POST['password1'];
     $password2 = $_POST['password2'];
-
-    // Validation
     if (empty($first_name) || empty($last_name) || empty($email) || empty($username)) {
         $message = "Fill all the required labels";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -45,23 +43,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Hash password
                     $password_hash = password_hash($password1, PASSWORD_BCRYPT);
 
-                    // Insert new admin
-                    $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash, First_name, Last_name, phone, role) VALUES (?, ?, ?, ?, ?, ?, 'admin')");
-                    $stmt->execute([
-                        $username,
-                        $email,
-                        $password_hash,
-                        $first_name,
-                        $last_name,
-                        $phone
-                    ]);
+                    // Insert as technician
+                    $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash, First_name, Last_name, phone, role) VALUES (?, ?, ?, ?, ?, ?, 'technician')");
+                    $stmt->execute([$username, $email, $password_hash, $first_name, $last_name, $phone]);
 
                     $message = 'Account created successfully!';
                 }
             }
         } catch (Exception $e) {
             $message = 'Error!';
-            error_log("Admin registration error: " . $e->getMessage());
+            error_log("Technician add error: " . $e->getMessage());
         }
     }
 }
@@ -70,13 +61,13 @@ if ($isAjax && $message) {
     exit;
 }
 ?>
-<div class="main-container admin">
-    <h2 class="title"><i class="fa-solid fa-user-shield"></i> Add New Admin</h2>
-  <div class="message" id="formMessage" style="display:none"></div>
+    <div class="main-container admin">
+    <h2 class="title"><i class="fa-solid fa-screwdriver-wrench"></i> Add New Technician</h2>
+     <div class="message" id="formMessage" style="display:none"></div>
         
         <!--form section-->
         <div class="form-box admin"> 
-            <form id = "addForm" action= "users/add_admin.php" method= "POST">
+            <form id = "addForm" action= "users/add_technician.php" method="POST">
             <div class="input-box">
                 <input type="text" name="first_name" required>
                 <label >First name</label>
@@ -127,4 +118,3 @@ if ($isAjax && $message) {
         </form></div>
        
 </div>
-       

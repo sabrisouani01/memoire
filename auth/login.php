@@ -34,9 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['profile_image'] = $user['profile_image'] ?? 'default.jpg';
 
                     if ($user['role'] === 'admin') {
-                        header("Location: ../admin/dashbord.php");
+                        header("Location: ../admin/layout.php");
                     } elseif ($user['role'] === 'technician') {
-                        header("Location: ../technician/panel.php");
+                        header("Location: ../technician/index.php");
                     } else {
 
                         header("Location: ../client/index.php");
@@ -128,8 +128,8 @@ elseif ($action === 'register') {
     WHERE id = ?
 ");
                     $stmt->execute([$token, $user['id']]);
-
-                    // TODO: Send email with reset link
+                     $resetlink = "http://localhost/memoire/auth/reset_password.php?token=$token";
+                    //Send email with reset link
                     // Example: https://yourdomain.com/reset_password.php?token=$token
                     $message = "A password reset link has been sent to your email.";
                 }
@@ -143,12 +143,12 @@ elseif ($action === 'register') {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang = "en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wise Tech - Next Generation</title>
-    <link rel="stylesheet" href="logins.css">
+    <link rel="stylesheet" href="../assests/css/login.css">
     <script src="https://kit.fontawesome.com/4060ace190.js" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -282,6 +282,6 @@ elseif ($action === 'register') {
 </div>
 
     </div>
-    <script src="logins.js"></script>
+    <script src="../assests/js/login.js"></script>
 </body>
 </html>
