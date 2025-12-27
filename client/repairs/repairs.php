@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-require_once '../../includes/db_connect.php';
+require_once '../../include/db_connect.php';
 
 $user_id = $_SESSION['user_id'];
 

@@ -1,5 +1,16 @@
 <?php
-require "include/db_connect.php";
+// الاتصال بقاعدة البيانات (PDO)
+include "include/db_connect.php";
+
+// Fetch active products with category_id
+$stmt = $pdo->query("
+    SELECT p.*, c.id AS category_id 
+    FROM products p 
+    JOIN categories c ON p.category_id = c.id 
+    WHERE p.is_active = 1 
+    ORDER BY p.created_at DESC
+");
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -7,9 +18,7 @@ require "include/db_connect.php";
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wise Tech - Next Generation</title>
-
-  <link rel="stylesheet" href="./css/main.css" />
-  <link rel="stylesheet" href="./assests/css/main.css">
+  <link rel="stylesheet" href="assests/css/main.css" />
   <script src="https://kit.fontawesome.com/4060ace190.js" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -21,21 +30,57 @@ require "include/db_connect.php";
     </div>
 
     <nav class="nav-links" id="nav-links">
-      <a href="#home">Home</a>
-      <a href="#products">Products</a>
-      <a href="#warranty">Warranty</a>
+      <a href="#home">الرئيسية</a>
+      <a href="#products">المنتجات</a>
+      <a href="#warranty">الضمان</a>
+      <a href="#contact">اتصل بنا</a>
     </nav>
 
     <div class="nav-icons">
-      <a href="#" class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></a>
-      <a href="#" class="icon-box"><i class="fa-solid fa-heart"></i></a>
-      <a href="#" class="icon-box"><i class="fa-solid fa-cart-shopping"></i></a>
-      <a href="./auth/login.php" class="icon-box"><i class="fa-solid fa-user"></i></a>
+      <a href="#" class="icon-box" id="search-icon">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </a>
+      <!-- Login icon instead of user dropdown -->
+      <a href="auth/login.php" class="icon-box">
+        <i class="fa-solid fa-user"></i>
+      </a>
       <span class="menu" id="menu"><i class="fa-solid fa-bars"></i></span>
     </div>
   </div>
 </header>
 
+<!-- ===== SEARCH MODAL ===== -->
+<div class="search-modal" id="search-modal">
+  <div class="search-modal-content">
+    <span class="close-search" id="close-search">&times;</span>
+    <h3>بحث متقدم</h3>
+    <form id="search-form">
+      <div class="search-group">
+        <label>اسم المنتج</label>
+        <input type="text" id="search-term" placeholder="مثل: iPhone..." />
+      </div>
+      <div class="search-group">
+        <label>الفئة</label>
+        <select id="category-filter">
+          <option value="">الكل</option>
+          <option value="1">الهواتف</option>
+          <option value="2">لابتوبات</option>
+        </select>
+      </div>
+      <div class="search-group">
+        <label>الحد الأدنى (دج)</label>
+        <input type="number" id="min-price" placeholder="0" min="0" />
+      </div>
+      <div class="search-group">
+        <label>الحد الأقصى (دج)</label>
+        <input type="number" id="max-price" placeholder="100000" min="0" />
+      </div>
+      <button type="submit" class="search-btn">بحث</button>
+    </form>
+  </div>
+</div>
+
+<!-- ===== Hero ===== -->
 <section class="hero" id="home">
   <img src="assests/uploads/photo_5922664454585781268_x.jpg" class="hero-img active" id="img1" />
   <img src="assests/uploads/photo_5922664454585781246_x.jpg" class="hero-img" id="img2" />
@@ -50,48 +95,32 @@ require "include/db_connect.php";
   <button class="side-btn next" onclick="changeHero(1)">></button>
 </section>
 
+<!-- ===== Products ===== -->
 <section class="products-section" id="products">
-  <h2 class="section-title">🔥 Our Products</h2>
-
+  <h2 class="section-title">🔥 منتجاتنا</h2>
   <div class="products">
-    <?php
-      try {
-          $sql = "SELECT * FROM products ORDER BY created_at DESC";
-          $stmt = $pdo->query($sql);
-          $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-      } catch (PDOException $e) {
-          echo '<p style="text-align:center;">خطأ في تحميل المنتجات</p>';
-          exit;
-      }
-
-      if (!empty($products)):
-          foreach ($products as $row):
-    ?>
-      <div class="product-card">
-        <div class="product-top">
-          <img
-            src="assests/uploads/<?php echo htmlspecialchars($row['image_url'], ENT_QUOTES, 'UTF-8'); ?>"
-            onclick="toggleDetails(this)"
-            alt="<?php echo htmlspecialchars($row['name_ar'], ENT_QUOTES, 'UTF-8'); ?>"
-          />
-          <div class="details">
-            <p><?php echo htmlspecialchars($row['description_ar'], ENT_QUOTES, 'UTF-8'); ?></p>
+    <?php if (!empty($products)): ?>
+      <?php foreach ($products as $p): ?>
+        <div class="product-card" data-category="<?= $p['category_id'] ?>">
+          <div class="product-top">
+            <img
+              src="assests/uploads/<?= htmlspecialchars($p['image_url']) ?>"
+              onclick="toggleDetails(this)"
+              alt="<?= htmlspecialchars($p['name_ar']) ?>"
+            />
+            <div class="details">
+              <p><?= htmlspecialchars($p['description_ar']) ?></p>
+            </div>
+          </div>
+          <div class="product-bottom">
+            <h3><?= htmlspecialchars($p['name_ar']) ?></h3>
+            <p class="price"><?= number_format($p['price'], 2) ?> دج</p>
+            <button class="buy-btn">شراء</button>
           </div>
         </div>
-
-        <div class="product-bottom">
-          <h3><?php echo htmlspecialchars($row['name_ar'], ENT_QUOTES, 'UTF-8'); ?></h3>
-          <p class="price">
-            <?php echo number_format((float)$row['price'], 2); ?> دج
-          </p>
-          <button class="buy-btn">شراء</button>
-        </div>
-      </div>
-    <?php
-          endforeach;
-      else:
-    ?>
-      <p style="text-align:center;">لا توجد منتجات حاليا</p>
+      <?php endforeach; ?>
+    <?php else: ?>
+      <p style="text-align:center; width:100%;">لا توجد منتجات حالياً</p>
     <?php endif; ?>
   </div>
 </section>
@@ -99,7 +128,6 @@ require "include/db_connect.php";
 <section class="warranty-conditions" id="warranty">
   <h2 class="warranty-title">شروط الضمان الأساسية</h2>
   <div class="title-line"></div>
-
   <div class="conditions-container">
     <div class="condition-card">
       <div class="condition-number">1</div>
@@ -108,22 +136,18 @@ require "include/db_connect.php";
         <p>العلبة، الحماية الداخلية، الملصقات والملحقات يُعد شرطًا أساسيًا للاستفادة من الضمان.</p>
       </div>
     </div>
-
     <div class="condition-card">
       <div class="condition-number">2</div>
       <div class="condition-content">
         <h3>الضمان لا يشمل استرجاع المبلغ</h3>
-        <p>
-          الضمان لا يمنح الزبون الحق في استرجاع المبلغ المدفوع.
-          في حال وجود عطل، يتم الإصلاح أو الاستبدال فقط.
-        </p>
+        <p>الضمان لا يمنح الزبون الحق في استرجاع المبلغ المدفوع. في حال وجود عطل، يتم الإصلاح أو الاستبدال فقط.</p>
       </div>
     </div>
   </div>
 </section>
 
 <footer class="footer">
-  <p>© 2025 Wise Tech - All Rights Reserved</p>
+  <p>© 2025 Wise Tech - جميع الحقوق محفوظة</p>
 </footer>
 
 <script src="assests/js/script.js"></script>

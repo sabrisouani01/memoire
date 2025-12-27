@@ -9,7 +9,6 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username']) : 'زائر';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wise Tech - Client Interface</title>
-    <!-- Link to user.css from assets/css folder -->
     <link rel="stylesheet" href="../assests/css/user.css" />
     <script src="https://kit.fontawesome.com/4060ace190.js" crossorigin="anonymous"></script>
 </head>
@@ -24,19 +23,19 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username']) : 'زائر';
         <nav class="nav-links" id="nav-links">
             <a href="#home">الرئيسية</a>
             <a href="#products">المنتجات</a>
+            <a href="#warranty">الضمان</a>
             <a href="#contact">اتصل بنا</a>
-            <!-- NEW LINKS - Updated paths -->
-            <a href="./client/orders/orders.php" id="orders-link">الطلبات</a>
-            <a href="./client/repairs/repairs.php" id="repairs-link">الصيانة</a>
+            <?php if ($isLoggedIn): ?>
+                <a href="orders/orders.php">الطلبات</a>
+                <a href="repairs/repairs.php">الصيانة</a>
+            <?php endif; ?>
         </nav>
         <div class="nav-icons">
-            <!-- UPDATED USER INFO -->
             <div class="user-info" id="user-menu-trigger">
                 <i class="fa-solid fa-user"></i>
                 <span class="username" id="username"><?php echo $username; ?></span>
-                <i class="fa-solid fa-chevron-down" style="font-size:12px; margin-left:5px;"></i>
+                <i class="fa-solid fa-chevron-down"></i>
             </div>
-            <!-- UPDATED ICONS -->
             <a href="#" class="icon-box" id="search-icon"><i class="fa-solid fa-magnifying-glass"></i></a>
             <a href="#" class="icon-box" id="cart-icon"><i class="fa-solid fa-cart-shopping"></i></a>
             <span class="menu" id="menu"><i class="fa-solid fa-bars"></i></span>
@@ -46,12 +45,11 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username']) : 'زائر';
     <!-- USER DROPDOWN -->
     <div class="dropdown-menu" id="user-dropdown">
         <?php if ($isLoggedIn): ?>
-            <!-- Profile link points to orders page for now -->
-            <a href="./client/orders/orders.php">الملف الشخصي</a>
+            <a href="orders/orders.php">الملف الشخصي</a>
             <a href="../auth/logout.php">تسجيل الخروج</a>
         <?php else: ?>
-            <a href="./auth/login.php">تسجيل الدخول</a>
-            <a href="./auth/register.php">إنشاء حساب</a>
+            <a href="../auth/login.php">تسجيل الدخول</a>
+            <a href="../auth/register.php">إنشاء حساب</a>
         <?php endif; ?>
     </div>
 
@@ -63,7 +61,7 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username']) : 'زائر';
             <form id="search-form">
                 <div class="search-group">
                     <label>اسم المنتج</label>
-                    <input type="text" id="search-term" placeholder="مثل: iPhone...">
+                    <input type="text" id="search-term" placeholder="مثل: iPhone..." />
                 </div>
                 <div class="search-group">
                     <label>الفئة</label>
@@ -75,11 +73,11 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username']) : 'زائر';
                 </div>
                 <div class="search-group">
                     <label>الحد الأدنى (دج)</label>
-                    <input type="number" id="min-price" placeholder="0" min="0">
+                    <input type="number" id="min-price" placeholder="0" min="0" />
                 </div>
                 <div class="search-group">
                     <label>الحد الأقصى (دج)</label>
-                    <input type="number" id="max-price" placeholder="100000" min="0">
+                    <input type="number" id="max-price" placeholder="100000" min="0" />
                 </div>
                 <button type="submit" class="search-btn">بحث</button>
             </form>
@@ -105,27 +103,69 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username']) : 'زائر';
     </div>
 </header>
 
-<!-- ===== Products ===== -->
+<!-- ===== Products (Dynamically Loaded) ===== -->
 <section class="products-section" id="products">
     <h2 class="section-title">منتجاتنا</h2>
     <div class="products">
-        <div class="product-card">
-            <div class="badge">جديد</div>
-            <div class="product-top">
-                <img src="../assests/uploads/iphone.jpg" alt="iPhone" onclick="toggleDetails(this)" />
-                <div class="details">
-                    <p>📱 الرام: 4GB</p>
-                    <p>💾 السعة: 128GB</p>
-                    <p>📷 الكاميرا: 12MP</p>
+        <?php
+        require_once '../include/db_connect.php';
+        $stmt = $pdo->query("SELECT p.*, c.id AS category_id FROM products p JOIN categories c ON p.category_id = c.id WHERE p.is_active = 1 ORDER BY p.created_at DESC");
+        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!empty($products)):
+            foreach ($products as $p):
+        ?>
+            <div class="product-card" data-category="<?= $p['category_id'] ?>">
+                <?php if (!empty($p['image_url'])): ?>
+                    <div class="product-top">
+                        <img 
+                            src="../assests/uploads/<?= htmlspecialchars($p['image_url']) ?>" 
+                            alt="<?= htmlspecialchars($p['name_ar']) ?>" 
+                            onclick="toggleDetails(this)" />
+                        <div class="details">
+                            <p>📱 الرام: <?= htmlspecialchars($p['ram'] ?? 'غير محدد') ?></p>
+                            <p>💾 السعة: <?= htmlspecialchars($p['storage'] ?? 'غير محدد') ?></p>
+                            <p>📷 الكاميرا: <?= htmlspecialchars($p['camera'] ?? 'غير محدد') ?></p>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                <div class="product-bottom">
+                    <h3><?= htmlspecialchars($p['name_ar']) ?></h3>
+                    <p class="price"><?= number_format($p['price'], 2) ?> دج</p>
+                    <button class="buy-btn" 
+                        data-id="<?= $p['id'] ?>"
+                        data-name="<?= htmlspecialchars($p['name_ar']) ?>"
+                        data-price="<?= $p['price'] ?>"
+                        data-img="../assests/uploads/<?= htmlspecialchars($p['image_url']) ?>">
+                        شراء
+                    </button>
                 </div>
             </div>
-            <div class="product-bottom">
-                <h3>iPhone 11</h3>
-                <p class="price">80000 دج</p>
-                <button class="buy-btn" data-id="1" data-name="iPhone 11" data-price="80000" data-img="assets/uploads/iphone.jpg">شراء</button>
+        <?php endforeach; else: ?>
+            <p style="text-align:center; width:100%;">لا توجد منتجات متاحة.</p>
+        <?php endif; ?>
+    </div>
+</section>
+
+<!-- ===== Warranty Section ===== -->
+<section class="warranty-conditions" id="warranty">
+    <h2 class="warranty-title">شروط الضمان الأساسية</h2>
+    <div class="title-line"></div>
+    <div class="conditions-container">
+        <div class="condition-card">
+            <div class="condition-number">1</div>
+            <div class="condition-content">
+                <h3>الاحتفاظ بالتغليف الأصلي الكامل</h3>
+                <p>العلبة، الحماية الداخلية، الملصقات والملحقات يُعد شرطًا أساسيًا للاستفادة من الضمان.</p>
             </div>
         </div>
-        <!-- Add more products as needed with data-* attributes -->
+        <div class="condition-card">
+            <div class="condition-number">2</div>
+            <div class="condition-content">
+                <h3>الضمان لا يشمل استرجاع المبلغ</h3>
+                <p>الضمان لا يمنح الزبون الحق في استرجاع المبلغ المدفوع. في حال وجود عطل، يتم الإصلاح أو الاستبدال فقط.</p>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -133,11 +173,9 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username']) : 'زائر';
     <p>© 2025 Wise Tech - جميع الحقوق محفوظة</p>
 </footer>
 
-<!-- Pass login state to JS -->
 <script>
     window.IS_LOGGED_IN = <?php echo $isLoggedIn ? 'true' : 'false'; ?>;
 </script>
-<!-- Link to user.js from assets/js folder -->
 <script src="../assests/js/user.js"></script>
 </body>
 </html>
