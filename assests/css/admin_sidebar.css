@@ -1,10 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-*{
+
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "poppins";
+    font-family: "Poppins", sans-serif;
 }
+
 .sidebar {
     position: fixed;
     top: 0;
@@ -15,7 +17,7 @@
     padding: 20px 15px;
     overflow-y: auto;
     z-index: 1500;
-    direction: ltr; 
+    direction: ltr;
     text-align: left;
     box-shadow: 2px 0 10px rgba(0,0,0,0.05);
 }
@@ -27,12 +29,10 @@
     margin-bottom: 30px;
     color: #222020;
     padding: 0 14px;
-    
-    /* Layout Alignment */
     display: flex;
-    flex-direction: row; /* Ensures horizontal flow */
+    flex-direction: row;
     align-items: center;
-    justify-content: flex-start; /* Aligns to the left */
+    justify-content: flex-start;
     gap: 12px;
 }
 
@@ -55,13 +55,13 @@
     cursor: pointer;
     transition: all 0.2s ease;
     margin-bottom: 5px;
-    color: #222020; 
+    color: #222020;
     font-weight: 500;
 }
 
 /* --- Icon Styling --- */
 .sidebar-menu li i {
-    width: 24px; 
+    width: 24px;
     text-align: center;
     font-size: 18px;
 }
@@ -74,8 +74,16 @@
 }
 
 /* --- Active Item --- */
+/* ===== FORCE ACTIVE STATE ===== */
 .sidebar-menu li.active {
-    background: #2563eb;
-    color: #fff;
+    background-color: #2563eb !important;
+    color: #ffffff !important;
     font-weight: 600;
+    transform: translateX(5px);
+}
+
+/* تأكيد أن الأيقونة والنص يتغيران */
+.sidebar-menu li.active i,
+.sidebar-menu li.active span {
+    color: #ffffff !important;
 }

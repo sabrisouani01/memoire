@@ -2,78 +2,85 @@
 require "../includes/admin_auth.php";
 include "../../include/db_connect.php";
 
-try {
-    $sql = "SELECT p.*, c.name_ar AS cat_name_ar, c.name_en AS cat_name_en 
-            FROM products p 
-            JOIN categories c ON p.category_id = c.id 
-            ORDER BY p.created_at DESC";
-    $result = $pdo->query($sql);
-    $products = $result->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    die("خطأ في قاعدة البيانات: " . $e->getMessage());
-}
-?>
-    <!-- Main Content -->
-    <div class="content">
-        <h2>📦 قائمة المنتجات</h2>
-        <a href="products/add.php" class="btn btn-primary mb-3">➕ إضافة منتج</a>
+$cats = $pdo->query("SELECT id, name_en FROM categories")->fetchAll();
 
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th>الرقم</th>
-                    <th>الاسم (عربي)</th>
-                    <th>Name (English)</th>
-                    <th>السعر (دج)</th>
-                    <th>الوصف (عربي)</th>
-                    <th>Description (English)</th>
-                    <th>التصنيف</th>
-                    <th>الكمية</th>
-                    <th>الصورة</th>
-                    <th>تاريخ الإضافة</th>
-                    <th>إجراءات</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (count($products) > 0): ?>
-                    <?php foreach ($products as $row): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($row['id']); ?></td>
-                            <td><?= htmlspecialchars($row['name_ar']); ?></td>
-                            <td><?= htmlspecialchars($row['name_en']); ?></td>
-                            <td><?= number_format($row['price'], 2); ?></td>
-                            <td><?= htmlspecialchars(substr($row['description_ar'], 0, 100)); ?>...</td>
-                            <td><?= htmlspecialchars(substr($row['description_en'], 0, 100)); ?>...</td>
-                            <td><?= htmlspecialchars($row['cat_name_ar']); ?> (<?= htmlspecialchars($row['cat_name_en']); ?>)</td>
-                            <td style="color: <?= $row['stock_quantity'] <= 5 ? 'red' : 'inherit' ?>">
-                                <?= htmlspecialchars($row['stock_quantity']); ?>
-                                <?= $row['stock_quantity'] <= 5 ? ' ⚠️' : '' ?>
-                            </td>
-                            <td>
-                                <?php if (!empty($row['image_url'])): ?>
-                                    <img src="../../assests/uploads/<?= htmlspecialchars(basename($row['image_url'])); ?>" width="80">
-                                <?php else: ?>
-                                    <span class="text-muted">لا صورة</span>
-                                <?php endif; ?>
-                            </td>
-                            <td><?= htmlspecialchars(date('Y-m-d', strtotime($row['created_at']))); ?></td>
-                            <td>
-                                <a href="products/edit.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-warning">✏️ تعديل</a>
-                                <a href="products/delete.php?id=<?= $row['id']; ?>" 
-                                   class="btn btn-sm btn-danger" 
-                                   onclick="return confirm('هل أنت متأكد أنك تريد حذف هذا المنتج؟')">
-                                    🗑 حذف
-                                </a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="11" class="text-center text-danger">
-                            <strong>⚠️ لا توجد منتجات</strong>
-                        </td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+$products = $pdo->query("
+    SELECT *
+    FROM products
+    ORDER BY created_at DESC
+")->fetchAll(PDO::FETCH_ASSOC);
+?>
+
+<div class="products-page">
+    <h2 class="admin-dash-title">
+        <i class="fa-solid fa-box"></i> Products
+    </h2>
+    <div class="products-header">
+
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Search product...">
+        </div>
+
+        <div class="actions">
+            <select id="filterCategory">
+                <option value="">All categories</option>
+                <?php foreach ($cats as $c): ?>
+                    <option value="<?= $c['id'] ?>">
+                        <?= htmlspecialchars($c['name_en']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <select id="filterStock">
+                <option value="">All products</option>
+                <option value="in">On stock</option>
+                <option value="out">Out of stock</option>
+            </select>
+
+            <a href="#" data-page="products/add" class="ajax-link btn-add22">
+                <i class="fa-solid fa-plus"></i> Add product
+            </a>
+        </div>
+
     </div>
+
+    <div class="products-list" id="productsList">
+
+        <?php foreach ($products as $p): ?>
+        <div class="product-row">
+
+            <div class="product-info">
+                <img src="../assests/uploads/<?= htmlspecialchars($p['image_url']) ?>">
+                <div>
+                    <strong><?= htmlspecialchars($p['name_en']) ?></strong>
+                    <small>ID: <?= $p['id'] ?></small>
+                </div>
+            </div>
+
+            <div class="product-price">
+                $<?= number_format($p['price'], 2) ?>
+            </div>
+
+            <div class="product-stock">
+                <div class="progress">
+                    <span style="width:<?= min(100, $p['stock_quantity']) ?>%"></span>
+                </div>
+                <small><?= $p['stock_quantity'] ?> in stock</small>
+            </div>
+
+            <div class="product-actions">
+                <a href="#" class="ajax-link" data-page="products/edit" data-id="<?=$p['id']?>">
+                    <i class="fa-solid fa-pen" ></i>
+                </a>
+                <a href="#" class="delete-product" data-page="prodects/delete" data-id="<?=$p['id']?>" >
+                    <i class="fa-solid fa-trash"></i>
+                </a>
+            </div>
+
+        </div>
+        <?php endforeach; ?>
+
+    </div>
+
+</div>
