@@ -168,6 +168,60 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username']) : 'زائر';
         </div>
     </div>
 </section>
+<!-- ===== Contact Info ===== -->
+<section class="contact-info-section" id="contact">
+  <div class="contact-wrapper">
+
+    <div class="contact-left">
+      <span class="contact-line"></span>
+    </div>
+
+    <div class="contact-right">
+      <h2>Contact Info</h2>
+
+      <div class="contact-item">
+        <div class="icon-circle">
+          <i class="fa-solid fa-location-dot"></i>
+        </div>
+        <div class="text">
+          <h4>Address</h4>
+          <p>Skikda, Algeria</p>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <div class="icon-circle">
+          <i class="fa-solid fa-phone"></i>
+        </div>
+        <div class="text">
+          <h4>Phone</h4>
+          <p>0655880712 - 0673633916</p>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <div class="icon-circle">
+          <i class="fa-solid fa-envelope"></i>
+        </div>
+        <div class="text">
+          <h4>Email</h4>
+          <p>contact@wisetech.dz</p>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <div class="icon-circle">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+        <div class="text">
+          <h4>Working Hours</h4>
+          <p>24 / 7</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
 
 <footer class="footer">
     <p>© 2025 Wise Tech - جميع الحقوق محفوظة</p>
