@@ -1,10 +1,5 @@
 <?php
-session_start();
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: ../../auth/login.php");
-    exit;
-}
-
+require "../includes/admin_auth.php";
 include "../../include/db_connect.php";
 
 $message = '';
@@ -30,47 +25,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+    <div class="category-container">
 
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>➕ إضافة تصنيف</title>
-    <link rel="stylesheet" href="../../assests/css/bootstrap.min.css">
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; }
-        .container { max-width: 600px; margin: 40px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .form-control { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
-        .btn-primary { background: #007bff; color: white; }
-        .btn-secondary { background: #6c757d; color: white; }
-        .alert { padding: 12px; margin: 10px 0; background: #f8d7da; color: #721c24; border-radius: 6px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>➕ إضافة تصنيف جديد</h2>
+    <h2 class="category-title">
+        <i class="fa-solid fa-folder-plus"></i> إضافة تصنيف
+    </h2>
 
-        <?php if ($message): ?>
-            <div class="alert"><?= htmlspecialchars($message) ?></div>
-        <?php endif; ?>
+    <div class="category-message" id="formMessage" style="display:none"></div>
 
-        <form method="post">
-            <div>
-                <label>الاسم (عربي)</label>
-                <input type="text" name="name_ar" class="form-control" required>
-            </div>
-            <div>
-                <label>Nom (Français)</label>
-                <input type="text" name="name_fr" class="form-control" required>
-            </div>
-            <div>
-                <label>Name (English)</label>
-                <input type="text" name="name_en" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary">💾 حفظ التصنيف</button>
-            <a href="index.php" class="btn btn-secondary">⬅️ رجوع</a>
-        </form>
-    </div>
-</body>
-</html>
+    <form id="addForm" class="category-form" method="post">
+
+        <div class="category-input">
+            <input type="text" name="name_ar" required>
+            <label>الاسم (عربي)</label>
+        </div>
+
+        <div class="category-input">
+            <input type="text" name="name_fr" required>
+            <label>Nom (Français)</label>
+        </div>
+
+        <div class="category-input">
+            <input type="text" name="name_en" required>
+            <label>Name (English)</label>
+        </div>
+
+        <button type="submit" class="category-btn primary">
+           <i class="fa-regular fa-floppy-disk"></i>
+                save
+        </button>
+
+        <button type="button"
+                class="category-btn secondary ajax-link"
+                data-page="categories/index">
+            <i class="fa-solid fa-backward"></i>
+                back
+        </button>
+
+    </form>
+
+</div>

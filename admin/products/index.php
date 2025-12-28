@@ -70,10 +70,10 @@ $products = $pdo->query("
             </div>
 
             <div class="product-actions">
-                <a href="#" class="ajax-link" data-page="products/edit" data-id="<?=$p['id']?>">
+                <a href="#" class="ajax-link" data-page="products/edit.php" data-id="<?=$p['id']?>" title="Edit">
                     <i class="fa-solid fa-pen" ></i>
                 </a>
-                <a href="#" class="delete-product" data-page="prodects/delete" data-id="<?=$p['id']?>" >
+                <a href="#" class="delete-product" data-page="prodects/delete" data-id="<?=$p['id']?>" title="Remove">
                     <i class="fa-solid fa-trash"></i>
                 </a>
             </div>

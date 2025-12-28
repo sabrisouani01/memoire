@@ -1,45 +1,48 @@
 <?php
-session_start();
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: ../../auth/login.php");
-    exit;
-}
-
+require "../includes/admin_auth.php";
 include "../../include/db_connect.php";
 
 $id = $_GET['id'] ?? null;
 
 if (!$id || !is_numeric($id)) {
-    die("ID غير صالح.");
+    die("invalid id");
 }
 
-// Check if user exists
-$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ? AND role = 'customer'");
-$user = $stmt->execute([$id]) ? $stmt->fetch() : null;
+/* تحقق من وجود المستخدم */
+$stmt = $pdo->prepare(
+    "SELECT id FROM users WHERE id = ? AND role = 'customer'"
+);
+$stmt->execute([$id]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {
-    die("العميل غير موجود.");
+    die("customer not found");
 }
 
-// Start transaction
-$pdo->beginTransaction();
-
 try {
-    // Delete order items
-    $pdo->prepare("DELETE oi FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE o.user_id = ?")->execute([$id]);
+    $pdo->beginTransaction();
 
-    // Delete orders
-    $pdo->prepare("DELETE FROM orders WHERE user_id = ?")->execute([$id]);
+    // حذف عناصر الطلبات
+    $stmt = $pdo->prepare("
+        DELETE oi
+        FROM order_items oi
+        INNER JOIN orders o ON oi.order_id = o.id
+        WHERE o.user_id = ?
+    ");
+    $stmt->execute([$id]);
 
-    // Delete user
-    $pdo->prepare("DELETE FROM users WHERE id = ?")->execute([$id]);
+    // حذف الطلبات
+    $stmt = $pdo->prepare("DELETE FROM orders WHERE user_id = ?");
+    $stmt->execute([$id]);
+
+    // حذف المستخدم
+    $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
+    $stmt->execute([$id]);
 
     $pdo->commit();
 
-    header("Location: index.php");
-    exit;
+    echo "success";
 } catch (Exception $e) {
-    $pdo->rollback();
-    die("خطأ في الحذف: " . $e->getMessage());
+    $pdo->rollBack();
+    die("error");
 }
-?>

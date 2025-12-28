@@ -1,0 +1,140 @@
+/* ================================
+   CATEGORIES
+================================ */
+.categories-container {
+    background: #fff;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.08);
+    margin-top: 30px;
+}
+
+/* HEADER */
+.categories-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.categories-title {
+    font-size: 26px;
+    font-weight: 600;
+    color: #222;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ADD BUTTON */
+.categories-add {
+    background: #54a0ff;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: .25s;
+}
+
+.categories-add:hover {
+    background: #2e86de;
+    transform: translateY(-2px);
+}
+
+/* ================================
+   TABLE
+================================ */
+.categories-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.categories-table thead th {
+    padding: 14px;
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+    border-bottom: 2px solid #eee;
+    text-align: left;
+}
+
+.categories-table tbody td {
+    padding: 14px;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+}
+
+.categories-table tbody tr:hover {
+    background: #fafafa;
+}
+
+/* EMPTY */
+.categories-empty {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+}
+
+/* ================================
+   ACTIONS
+================================ */
+.categories-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.categories-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: .25s;
+}
+
+/* DELETE */
+.categories-btn.delete {
+    background: #ffecec;
+    color: #ee5253;
+}
+
+.categories-btn.delete:hover {
+    background: #ee5253;
+    color: #fff;
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+@media (max-width: 768px) {
+    .categories-table thead {
+        display: none;
+    }
+
+    .categories-table,
+    .categories-table tbody,
+    .categories-table tr,
+    .categories-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .categories-table tr {
+        margin-bottom: 20px;
+        border: 1px solid #eee;
+        border-radius: 14px;
+        padding: 15px;
+    }
+
+    .categories-table td {
+        border: none;
+        padding: 8px 0;
+    }
+}

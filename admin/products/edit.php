@@ -2,133 +2,190 @@
 require "../includes/admin_auth.php";
 include "../../include/db_connect.php";
 
-$id = $_GET['id'] ?? null;
-if (!$id || !is_numeric($id)) die("ID غير صالح.");
+$isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH'])
+          && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
 
+/* ================================
+   التحقق من id
+================================ */
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+if ($id <= 0) {
+    echo "<div class='product-message'>id غير صالح</div>";
+    exit;
+}
+
+/* ================================
+   جلب المنتج
+================================ */
 $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
 $stmt->execute([$id]);
-$product = $stmt->fetch();
+$product = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$product) die("المنتج غير موجود.");
+if (!$product) {
+    echo "<div class='product-message'>المنتج غير موجود</div>";
+    exit;
+}
 
-$error = null;
+/* ================================
+   جلب التصنيفات
+================================ */
+$cats = $pdo->query("SELECT * FROM categories ORDER BY name_ar")->fetchAll();
 
-if (isset($_POST['update'])) {
-    $name_ar = trim($_POST['name_ar']);
-    $name_en = trim($_POST['name_en']);
-    $price = floatval($_POST['price']);
-    $desc_ar = trim($_POST['desc_ar']);
-    $desc_en = trim($_POST['desc_en']);
-    $stock_quantity = intval($_POST['stock_quantity']);
+/* ================================
+   تحديث المنتج
+================================ */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
 
-    if (empty($name_ar) || empty($name_en) || $price <= 0) {
-        $error = "جميع الحقول المطلوبة يجب ملؤها.";
-    } else {
-        $image = $product['image_url'];
-        if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-            $image = time() . "_" . basename($_FILES['image']['name']);
-            $path = "../../assests/uploads/" . $image;
-            move_uploaded_file($_FILES['image']['tmp_name'], $path);
+    $name_ar  = trim($_POST['name_ar']);
+    $name_en  = trim($_POST['name_en']);
+    $price    = (float)$_POST['price'];
+    $stock    = (int)$_POST['stock_quantity'];
+    $cat_id   = (int)$_POST['category_id'];
+
+    $image = $product['image_url'];
+
+    if (!empty($_FILES['image']['name'])) {
+        $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+        $newName = uniqid() . "." . $ext;
+        $uploadPath = "../../assests/uploads/" . $newName;
+
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadPath)) {
+            $image = $newName;
         }
+    }
 
-        $stmt = $pdo->prepare("UPDATE products SET 
-            name_ar=?, name_en=?, price=?, description_ar=?, description_en=?, 
-            image_url=?, stock_quantity=? 
-            WHERE id=?");
-        $stmt->execute([$name_ar, $name_en, $price, $desc_ar, $desc_en, $image, $stock_quantity, $id]);
+    $update = $pdo->prepare("
+        UPDATE products SET
+            name_ar = ?,
+            name_en = ?,
+            price = ?,
+            stock_quantity = ?,
+            category_id = ?,
+            image_url = ?
+        WHERE id = ?
+    ");
 
-        header("Location: index.php");
+    $update->execute([
+        $name_ar,
+        $name_en,
+        $price,
+        $stock,
+        $cat_id,
+        $image,
+        $id
+    ]);
+
+    if ($isAjax) {
+        echo "<div class='product-message'>success: product updated</div>";
         exit;
     }
 }
 ?>
-    <div class="container">
-        <div class="logo">
-            <h3>🔧 Wise Technologie</h3>
-        </div>
 
-        <h2>✏️ تعديل منتج</h2>
+<!-- ================================
+     EDIT PRODUCT UI
+================================ -->
+<div class="product-container">
 
-        <?php if ($error): ?>
-            <div class="alert">
-                <?= htmlspecialchars($error) ?>
-            </div>
-        <?php endif; ?>
+    <h2 class="title">
+        <i class="fa-solid fa-pen"></i> Edit Products
+    </h2>
 
-        <form method="post" enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">الاسم (عربي)</label>
-                        <input type="text" name="name_ar" value="<?= htmlspecialchars($product['name_ar']) ?>" class="form-control" required>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">Name (English)</label>
-                        <input type="text" name="name_en" value="<?= htmlspecialchars($product['name_en']) ?>" class="form-control" required>
-                    </div>
-                </div>
-            </div>
+    <div id="formMessage" class="product-message" style="display:none"></div>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">السعر (دج)</label>
-                        <input type="number" step="0.01" name="price" value="<?= htmlspecialchars($product['price']) ?>" class="form-control" required>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">الكمية في المخزن</label>
-                        <input type="number" name="stock_quantity" value="<?= htmlspecialchars($product['stock_quantity']) ?>" class="form-control" min="0">
-                    </div>
-                </div>
+    <div class="form-box product">
+
+        <form id="addForm"
+              method="post"
+              action="products/edit.php?id=<?= $product['id'] ?>"
+              enctype="multipart/form-data">
+
+            <div class="product-input">
+                <input type="text"
+                       name="name_ar"
+                       value="<?= htmlspecialchars($product['name_ar']) ?>"
+                       required
+                       placeholder=" ">
+                <label>Name (arabic)</label>
             </div>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">الوصف (عربي)</label>
-                        <textarea name="desc_ar" class="form-control"><?= htmlspecialchars($product['description_ar']) ?></textarea>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">Description (English)</label>
-                        <textarea name="desc_en" class="form-control"><?= htmlspecialchars($product['description_en']) ?></textarea>
-                    </div>
-                </div>
+            <div class="product-input">
+                <input type="text"
+                       name="name_en"
+                       value="<?= htmlspecialchars($product['name_en']) ?>"
+                       required
+                       placeholder=" ">
+                <label>Name (English)</label>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">التصنيف</label>
-                <select name="category_id" class="form-control" disabled>
-                    <?php
-                    $cats = $pdo->query("SELECT * FROM categories ORDER BY name_ar")->fetchAll();
-                    foreach ($cats as $c): ?>
-                        <option value="<?= $c['id'] ?>" <?= $c['id'] == $product['category_id'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($c['name_ar']) ?> (<?= htmlspecialchars($c['name_en']) ?>)
+            <div class="product-input">
+                <input type="number"
+                       step="0.01"
+                       name="price"
+                       value="<?= $product['price'] ?>"
+                       required
+                       placeholder=" ">
+                <label>Price</label>
+            </div>
+
+            <div class="product-input">
+                <input type="number"
+                       name="stock_quantity"
+                       value="<?= $product['stock_quantity'] ?>"
+                       required
+                       placeholder=" ">
+                <label>Quantity</label>
+            </div>
+
+            <!-- التصنيف (عرض فقط) -->
+            <div class="product-input">
+                <select disabled><?php foreach ($cats as $c): ?>
+                        <option <?= $c['id'] == $product['category_id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($c['name_ar']) ?>
+                            (<?= htmlspecialchars($c['name_en']) ?>)
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <small class="text-muted">تعديل التصنيف غير مدعوم حاليًا.</small>
+                <label>category
+                </label>
+
+                <input type="hidden"
+                       name="category_id"
+                       value="<?= (int)$product['category_id'] ?>">
             </div>
 
-            <div class="form-group">
-                <label class="form-label">الصورة الحالية</label><br>
+            <!-- الصورة -->
+            <div class="product-input">
+                <label>Current Image</label><br>
+
                 <?php if ($product['image_url']): ?>
-                    <img src="../../assests/uploads/<?= htmlspecialchars(basename($product['image_url'])) ?>" width="100" alt="Current Image">
+                    <img src="../assests/uploads/<?= htmlspecialchars($product['image_url']) ?>"
+                         width="120">
                 <?php else: ?>
-                    <span class="text-muted">لا صورة</span>
+                    <span class="text-muted">No picture</span>
                 <?php endif; ?>
+
                 <br><br>
-                <input type="file" name="image" class="form-control" accept="image/*">
+                <input type="file"
+                       name="image"
+                       accept="image/*">
             </div>
 
-            <div class="actions">
-                <button type="submit" name="update" class="btn btn-warning">✅ تحديث</button>
-                <a href="index.php" class="btn btn-secondary">⬅️ رجوع إلى القائمة</a>
-            </div>
+            <button type="submit"
+                    name="update"
+                    class="product-btn">
+                <i class="fa-solid fa-file-pen"></i> 
+                update
+            </button>
+
+            <button type="button"
+                    class="product-btn secondary ajax-link"
+                    data-page="products/index">
+                <i class="fa-solid fa-backward"></i>
+                back
+            </button>
+
         </form>
     </div>
+</div>
