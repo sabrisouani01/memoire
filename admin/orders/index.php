@@ -1,10 +1,5 @@
 <?php
-session_start();
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: ../../auth/login.php");
-    exit;
-}
-
+require "../includes/admin_auth.php";
 include "../../include/db_connect.php";
 
 // Get admin username
@@ -18,40 +13,6 @@ $sql = "SELECT o.*, u.First_name, u.Last_name, u.username, u.email, u.phone as u
 $stmt = $pdo->query($sql);
 $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
-
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>📑 الطلبيات</title>
-    <link rel="stylesheet" href="../../assests/css/admin.css">
-</head>
-<body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h4>⚙️ Admin</h4>
-        <!-- Show Admin Username -->
-        <p style="color: #ccc; font-size: 14px; text-align: center;">
-            مرحباً، <strong><?= $username ?></strong>
-        </p>
-        
-        <hr style="border-color: #495057; margin: 10px 0;">
-        <a href="../users/add_admin.php">➕ إضافة مدير</a>
-        <a href="../technician/add.php">➕ إضافة مصلح</a>
-        <a href="../dashbord.php">الرئيسية</a>
-        <a href="../products/index.php">المنتجات</a>
-        <a href="../orders/index.php" class="active">الطلبيات</a>
-        <a href="../customers/index.php">العملاء</a>
-        <a href="../reports/sales.php">التقارير</a>
-        <a href="../warranty/claims.php">الضمان</a>
-        <a href="../categories/index.php" >التصنيفات</a>
-        <a href="../repairs/index.php">🛠️ الإصلاحات</a>
-        <!-- Logout Button -->
-        <a href="../auth/logout.php" class="logout">
-            🔐 تسجيل الخروج
-        </a>
-    </div>
-
     <!-- Main Content -->
     <div class="content">
         <h2>📑 إدارة الطلبيات</h2>
@@ -114,5 +75,3 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </tbody>
         </table>
     </div>
-</body>
-</html>

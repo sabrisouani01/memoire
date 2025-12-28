@@ -10,8 +10,20 @@ require "includes/admin_auth.php";
     <link rel="stylesheet" href="users/add.css">
     <link rel="stylesheet" href="../assests/css/header.css">
     <link rel="stylesheet" href="../assests/css/admin_sidebar.css">
-    <link rel="stylesheet" href="../assests/css/admin_dashboard.css">
+    <link rel="stylesheet" href="../assests/css/admin_dashbord.css">
+    <link rel="stylesheet" href="../assests/css/products.css">
+    
 </head>
+<style>
+    .content{
+        margin-left: 260px;
+        margin-top: 64px;
+        height: 64px;
+        padding: 30px;
+        min-height: 100vh;
+        box-sizing: border-box;
+    }
+</style>
 <body>
     <?php
     include "includes/header.php";

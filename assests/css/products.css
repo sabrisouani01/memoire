@@ -1,0 +1,138 @@
+.products-page {
+    background: #f8f9fb;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    padding: 10px 14px;
+    border-radius: 10px;
+    width: 260px;
+}
+
+.search-box input {
+    border: none;
+    outline: none;
+    margin-left: 10px;
+    width: 100%;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.actions select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.btn-add22 {
+    background: #245bff;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 500;
+    list-style: none;
+   
+}
+.btn-add22 i {
+    color: #fff;
+}
+.btn-add22:hover{
+     background: #245bff;
+}
+
+.products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.product-row {
+    background: #fff;
+    padding: 14px 18px;
+    border-radius: 12px;
+    display: grid;
+    grid-template-columns: 2.5fr 1fr 2fr 1.5fr;
+    align-items: center;
+}
+
+.product-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.product-info img {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.product-info small {
+    color: #888;
+}
+
+.product-price {
+    font-weight: 600;
+}
+
+.product-stock .progress {
+    background: #E2E2E2;
+    height: 6px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.product-stock .progress span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+}
+
+.product-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 14px;
+    font-size: 16px;
+}
+
+.product-actions a {
+    text-decoration: none;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+/* اللون الافتراضي للأيقونات */
+.ajax-link{
+    color: #111827;
+    transition: color 0.2s ease;
+}
+/* hover */
+.product-actions .ajax-link:hover i {
+    color: #245bff;
+}
+/* delete أحمر */
+.product-actions a.delete-product i {
+    color: #e53935;
+}
+
+.product-actions a.delete-product:hover i {
+    color: #b71c1c;
+}

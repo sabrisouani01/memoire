@@ -1,4 +1,5 @@
 <?php
+require "../includes/admin_auth.php";
 include "../../include/db_connect.php";
 
 $error = null;
@@ -33,23 +34,6 @@ if (isset($_POST['save'])) {
     }
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>➕ إضافة منتج</title>
-    <!-- Link to external CSS -->
-   <link rel="stylesheet" href="../../assets/css/add-product.css">
-    <!-- Optional: Bootstrap for layout (you can remove if not needed) -->
-    <!-- <link rel="stylesheet" href="../../assets/css/bootstrap.min.css"> -->
-</head>
-<body>
-    <div class="container">
-        <div class="logo">
-            <h3>🔧 Wise Technologie</h3>
-        </div>
-
         <h2>➕ إضافة منتج جديد</h2>
 
         <?php if ($error): ?>
@@ -125,9 +109,7 @@ if (isset($_POST['save'])) {
 
             <div class="actions">
                 <button type="submit" name="save" class="btn btn-success">💾 حفظ المنتج</button>
-                <a href="index.php" class="btn btn-secondary">⬅️ رجوع إلى القائمة</a>
+                <a href="#" data-page="products/index" class="ajax-links btn btn-secondary">Return</a>
             </div>
         </form>
     </div>
-</body>
-</html>

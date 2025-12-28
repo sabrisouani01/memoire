@@ -1,4 +1,5 @@
 <?php
+require "../includes/admin_auth.php";
 include "../../include/db_connect.php";
 
 $id = $_GET['id'] ?? null;
@@ -41,16 +42,6 @@ if (isset($_POST['update'])) {
     }
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>✏️ تعديل منتج</title>
-    <!-- Link to external CSS -->
-    <link rel="stylesheet" href="../../assests/css/edit-product.css">
-</head>
-<body>
     <div class="container">
         <div class="logo">
             <h3>🔧 Wise Technologie</h3>
@@ -141,5 +132,3 @@ if (isset($_POST['update'])) {
             </div>
         </form>
     </div>
-</body>
-</html>
