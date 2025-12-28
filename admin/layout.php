@@ -12,7 +12,11 @@ require "includes/admin_auth.php";
     <link rel="stylesheet" href="../assests/css/admin_sidebar.css">
     <link rel="stylesheet" href="../assests/css/admin_dashbord.css">
     <link rel="stylesheet" href="../assests/css/products.css">
-    
+    <link rel="stylesheet" href="../assests/css/add_product.css">
+    <link rel="stylesheet" href="../assests/css/orders.css">
+    <link rel="stylesheet" href="../assests/css/customers.css">
+    <link rel="stylesheet" href="../assests/css/categorie.css">
+    <link rel="stylesheet" href="../assests/css/add_cat.css">
 </head>
 <style>
     .content{
@@ -31,6 +35,7 @@ require "includes/admin_auth.php";
     <div class="content" id="content"></div>
     <script src="../assests/js/ajax.js"></script>
     <script src="../assests/js/header.js"></script>
+    <script src="../assests/js/order.js"></script>
     <script src="https://kit.fontawesome.com/4060ace190.js" crossorigin="anonymous"></script>
 </body>
 </html>

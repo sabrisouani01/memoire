@@ -2,114 +2,156 @@
 require "../includes/admin_auth.php";
 include "../../include/db_connect.php";
 
+$isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH'])
+          && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
+
 $error = null;
 
-if (isset($_POST['save'])) {
-    $name_ar = trim($_POST['name_ar']);
-    $name_en = trim($_POST['name_en']);
-    $price = floatval($_POST['price']);
-    $desc_ar = trim($_POST['desc_ar']);
-    $desc_en = trim($_POST['desc_en']);
-    $category_id = intval($_POST['category_id']);
-    $stock_quantity = intval($_POST['stock_quantity']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
 
-    if (empty($name_ar) || empty($name_en) || $price <= 0 || $category_id <= 0) {
+    $name_ar  = trim($_POST['name_ar']);
+    $name_en  = trim($_POST['name_en']);
+    $price    = (float)$_POST['price'];
+    $desc_ar  = trim($_POST['desc_ar']);
+    $desc_en  = trim($_POST['desc_en']);
+    $category_id = (int)$_POST['category_id'];
+    $stock_quantity = (int)$_POST['stock_quantity'];
+
+    if (
+        $name_ar === '' ||
+        $name_en === '' ||
+        $price <= 0 ||
+        $category_id <= 0
+    ) {
         $error = "جميع الحقول المطلوبة يجب ملؤها.";
     } else {
+
         $image = null;
-        if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-            $image = time() . "_" . basename($_FILES['image']['name']);
+
+        if (!empty($_FILES['image']['name'])) {
+            $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $image = uniqid() . "." . $ext;
             $uploadDir = "../../assests/uploads/";
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
             move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $image);
         }
 
-        $stmt = $pdo->prepare("INSERT INTO products 
-            (name_ar, name_en, price, description_ar, description_en, image_url, category_id, stock_quantity) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$name_ar, $name_en, $price, $desc_ar, $desc_en, $image, $category_id, $stock_quantity]);
+        $stmt = $pdo->prepare("
+            INSERT INTO products
+            (name_ar, name_en, price, description_ar, description_en, image_url, category_id, stock_quantity)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+
+        $stmt->execute([
+            $name_ar,
+            $name_en,
+            $price,
+            $desc_ar,
+            $desc_en,
+            $image,
+            $category_id,
+            $stock_quantity
+        ]);
+
+        if ($isAjax) {
+            echo "<div class='product-message'>success: product added</div>";
+            exit;
+        }
 
         header("Location: index.php");
         exit;
     }
 }
+
+$cats = $pdo->query("SELECT * FROM categories ORDER BY name_ar")->fetchAll();
 ?>
-        <h2>➕ إضافة منتج جديد</h2>
 
-        <?php if ($error): ?>
-            <div class="alert">
-                <?= htmlspecialchars($error) ?>
-            </div>
-        <?php endif; ?>
+<!-- ================================
+     ADD PRODUCT UI
+================================ -->
+<div class="product-container">
 
-        <form method="post" enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">الاسم (عربي)</label>
-                        <input type="text" name="name_ar" class="form-control" required>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">Name (English)</label>
-                        <input type="text" name="name_en" class="form-control" required>
-                    </div>
-                </div>
-            </div>
+    <h2 class="title">
+        <i class="fa-solid fa-plus"></i> إضافة منتج جديد
+    </h2>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">السعر (دج)</label>
-                        <input type="number" step="0.01" name="price" class="form-control" required>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">الكمية في المخزن</label>
-                        <input type="number" name="stock_quantity" class="form-control" value="0" min="0">
-                    </div>
-                </div>
+    <div id="formMessage" class="product-message" style="display:<?= $error ? 'block' : 'none' ?>">
+        <?= $error ? htmlspecialchars($error) : '' ?>
+    </div>
+
+    <div class="form-box product">
+
+        <form id="addForm"
+              method="post"
+              action="products/add.php"
+              enctype="multipart/form-data">
+
+            <div class="product-input">
+                <input type="text" name="name_ar" required placeholder=" ">
+                <label>الاسم (عربي)</label>
+                <i class="fa-solid fa-box"></i>
             </div>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">الوصف (عربي)</label>
-                        <textarea name="desc_ar" class="form-control"></textarea>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">Description (English)</label>
-                        <textarea name="desc_en" class="form-control"></textarea>
-                    </div>
-                </div>
+            <div class="product-input">
+                <input type="text" name="name_en" required placeholder=" ">
+                <label>Name (English)</label>
+                <i class="fa-solid fa-box"></i>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">التصنيف</label>
-                <select name="category_id" class="form-control" required>
-                    <option value="">اختر التصنيف</option>
-                    <?php
-                    $cats = $pdo->query("SELECT * FROM categories ORDER BY name_ar")->fetchAll();
-                    foreach ($cats as $c): ?>
-                        <option value="<?= $c['id'] ?>">
-                            <?= htmlspecialchars($c['name_ar']) ?> (<?= htmlspecialchars($c['name_en']) ?>)
+            <div class="product-input">
+                <input type="number" step="0.01" name="price" required placeholder=" ">
+                <label>السعر</label>
+                <i class="fa-solid fa-dollar-sign"></i>
+            </div>
+
+            <div class="product-input">
+                <input type="number" name="stock_quantity" value="0" min="0" placeholder=" ">
+                <label>الكمية</label>
+                <i class="fa-solid fa-warehouse"></i>
+            </div>
+
+            <div class="product-input ">
+                <textarea name="desc_ar" placeholder=" "></textarea>
+                <label>الوصف (عربي)</label>
+            </div>
+
+            <div class="product-input textarea-input">
+                <textarea name="desc_en" placeholder=" "></textarea>
+                <label>Description (English)</label>
+            </div>
+
+            <div class="product-input textarea-input">
+                <select name="category_id" required>
+                    <option value="" disabled selected hidden></option>
+                    <?php foreach ($cats as $c): ?>
+                        <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['name_ar']) ?> (<?= htmlspecialchars($c['name_en']) ?>)
                         </option>
                     <?php endforeach; ?>
                 </select>
+                <label>التصنيف</label>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">الصورة</label>
-                <input type="file" name="image" class="form-control" accept="image/*">
+            <div class="product-input">
+                <input type="file" name="image" accept="image/*">
+                <label>الصورة</label>
             </div>
 
-            <div class="actions">
-                <button type="submit" name="save" class="btn btn-success">💾 حفظ المنتج</button>
-                <a href="#" data-page="products/index" class="ajax-links btn btn-secondary">Return</a>
-            </div>
+            <button type="submit" name="save" class="product-btn">
+                <i class="fa-regular fa-floppy-disk"></i>
+                save
+            </button>
+
+            <button type="button"
+                    class="product-btn secondary ajax-link"
+                    data-page="products/index">
+                <i class="fa-solid fa-backward"></i>
+                back
+            </button>
+
         </form>
     </div>
+</div>

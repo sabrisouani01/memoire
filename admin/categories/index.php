@@ -2,58 +2,69 @@
 require "../includes/admin_auth.php";
 include "../../include/db_connect.php";
 
-// Get admin username
-$username = htmlspecialchars($_SESSION['username']);
-
-// Fetch all categories
-try {
-    $stmt = $pdo->query("SELECT * FROM categories ORDER BY name_ar");
-    $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    die("خطأ في قاعدة البيانات: " . $e->getMessage());
-}
+$categories = $pdo->query("
+    SELECT *
+    FROM categories
+    ORDER BY name_ar
+")->fetchAll(PDO::FETCH_ASSOC);
 ?>
-    <!-- Main Content -->
-    <div class="content">
-        <h2>🗂️ إدارة التصنيفات</h2>
-        <a href="add.php" class="btn btn-success mb-3">➕ إضافة تصنيف</a>
 
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th>الرقم</th>
-                    <th>الاسم (عربي)</th>
-                    <th>Nom (Français)</th>
-                    <th>Name (English)</th>
-                    <th>إجراءات</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (count($categories) > 0): ?>
-                    <?php foreach ($categories as $cat): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($cat['id']); ?></td>
-                            <td><?= htmlspecialchars($cat['name_ar']); ?></td>
-                            <td><?= htmlspecialchars($cat['name_fr']); ?></td>
-                            <td><?= htmlspecialchars($cat['name_en']); ?></td>
-                            <td>
-                                <a href="delete.php?id=<?= $cat['id']; ?>" 
-                                   class="btn btn-sm btn-danger"
-                                   onclick="return confirm('هل أنت متأكد أنك تريد حذف هذا التصنيف؟')">
-                                    🗑 حذف
-                                </a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="5" class="text-center text-danger">
-                            <strong>⚠️ لا توجد تصنيفات</strong>
-                        </td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+<div class="categories-container">
+
+    <div class="categories-header">
+        <h2 class="categories-title">
+            <i class="fa-solid fa-folder-open"></i> Categories
+        </h2>
+
+        <a href="#" data-page="categories/add" class="categories-add ajax-link">
+            <i class="fa-solid fa-plus"></i> Add Category
+        </a>
     </div>
-</body>
-</html>
+
+    <table class="categories-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Arabic</th>
+                <th>French</th>
+                <th>English</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        <?php if ($categories): ?>
+            <?php foreach ($categories as $cat): ?>
+                <tr>
+                    <td><?= (int)$cat['id'] ?></td>
+
+                    <td><?= htmlspecialchars($cat['name_ar']) ?></td>
+
+                    <td><?= htmlspecialchars($cat['name_fr']) ?></td>
+
+                    <td><?= htmlspecialchars($cat['name_en']) ?></td>
+
+                    <td>
+                        <div class="categories-actions">
+                            <a href="#"
+                               class="categories-btn delete delete-category"
+                               data-page="categories/delete"
+                               data-id="<?= $cat['id'] ?>"
+                               title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="5" class="categories-empty">
+                    No categories found
+                </td>
+            </tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+
+</div>

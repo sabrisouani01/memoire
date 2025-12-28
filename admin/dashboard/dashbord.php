@@ -22,7 +22,8 @@ $stmt = $pdo->query("
         orders.id,
         orders.created_at,
         orders.status,
-        users.username
+        users.first_name,
+        users.last_name
     FROM orders
     JOIN users ON orders.user_id = users.id
     ORDER BY orders.created_at DESC
@@ -84,7 +85,7 @@ $recent_orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php foreach ($recent_orders as $order): ?>
                 <tr>
                     <td>#<?= $order['id'] ?></td>
-                    <td><?= htmlspecialchars($order['username']) ?></td>
+                    <td><?= htmlspecialchars($order['first_name'] . ' ' . $order['last_name']) ?></td>
                     <td><?= date('Y-m-d', strtotime($order['created_at'])) ?></td>
                     <td class="status <?= $order['status'] ?>">
                         <?= ucfirst($order['status']) ?>

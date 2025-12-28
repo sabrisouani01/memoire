@@ -1,19 +1,13 @@
 /* ================================
    تحميل الصفحة (layout)
 ================================ */
-function loadPage(page) {
-    if (!page) return;
+function loadPage(url) {
+    if (!url) return;
 
     const content = document.getElementById("content");
     if (!content) return;
 
     content.innerHTML = "<p>Loading...</p>";
-
-    // فصل المسار عن الـ query
-    let url = page;
-    if (!page.endsWith(".php")) {
-        url = page.includes("?") ? page : page + ".php";
-    }
 
     fetch(url)
         .then(res => {
@@ -50,7 +44,45 @@ document.addEventListener("click", function (e) {
 document.addEventListener("DOMContentLoaded", function () {
     loadPage("dashboard/dashbord");
 });
+/* ================================ 
+   submit method
+================================ */
+document.addEventListener("submit", function (e) {
 
+   
+    if (!e.target || e.target.tagName !== "FORM") return;
+
+    
+    if (e.target.id !== "addForm") return;
+
+    
+    if (e.target.method.toLowerCase() !== "post") return;
+
+    e.preventDefault();
+
+  
+    fetch(e.target.action, {
+        method: "POST",
+        headers: { "X-Requested-With": "XMLHttpRequest" },
+        body: new FormData(e.target)
+    })
+    .then(res => res.text())
+    .then(msg => {
+        const box = document.getElementById("formMessage");
+        if (!box) return;
+
+        box.innerHTML = msg;
+        box.style.display = "block";
+
+        if (msg.toLowerCase().includes("success")) {
+            e.target.reset();
+        }
+    })
+    .catch(() => {
+        const box = document.getElementById("formMessage");
+        if (box) box.innerHTML = "Server error";
+    });
+});
 /* ================================
    فلترة المنتجات (AJAX فقط)
 ================================ */
@@ -96,13 +128,14 @@ document.addEventListener("click", function (e) {
     if (!link) return;
 
     e.preventDefault();
-    e.stopPropagation(); // ✅ هذا هو الإصلاح
 
     const page = link.dataset.page;
     const id = link.dataset.id;
 
     let url = page;
-    if (id) url += "?id=" + id;
+    if (id) {
+        url += "?id=" + encodeURIComponent(id);
+    }
 
     loadPage(url);
 });
@@ -118,5 +151,44 @@ document.addEventListener("click", function (e) {
         .then(res => res.text())
         .then(() => {
             loadProducts(); // تحديث القائمة
+        });
+});
+/* ================================
+   حذف Customer (AJAX)
+================================ */
+document.addEventListener("click", function (e) {
+
+    const btn = e.target.closest(".delete-customer");
+    if (!btn) return;
+
+    if (!confirm("Delete this customer?")) return;
+
+    const id = btn.dataset.id;
+    if (!id) return;
+
+    fetch("/memoire/admin/customers/delete.php?id=" + id)
+        .then(res => res.text())
+        .then(() => {
+            btn.closest("tr").remove();
+        });
+});
+
+/* ================================
+   حذف Customer (AJAX)
+================================ */
+document.addEventListener("click", function (e) {
+
+    const btn = e.target.closest(".delete-category");
+    if (!btn) return;
+
+    if (!confirm("Delete this category?")) return;
+
+    const id = btn.dataset.id;
+    if (!id) return;
+
+    fetch("/memoire/admin/categories/delete.php?id=" + id)
+        .then(res => res.text())
+        .then(() => {
+            btn.closest("tr").remove();
         });
 });
