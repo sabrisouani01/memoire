@@ -1,27 +1,40 @@
-// STATUS CHANGE
-document.querySelectorAll('.order-status-select').forEach(sel => {
-    sel.addEventListener('change', () => {
-        fetch('update_status.php', {
-            method: 'POST',
-            headers: {'Content-Type':'application/x-www-form-urlencoded'},
-            body: 'id=${sel.dataset.id}&status=${sel.value}'
+document.addEventListener('click', function (e) {
+
+    /* ===============================
+       VIEW ORDER (EYE ICON)
+    ================================ */
+    const viewBtn = e.target.closest('.orders-btn.view');
+    if (viewBtn) {
+
+        const targetId = viewBtn.dataset.target;
+        const row = document.getElementById(targetId);
+        if (!row) return;
+
+        // إغلاق باقي التفاصيل
+        document.querySelectorAll('[id^="details-"]').forEach(r => {
+            if (r !== row) r.style.display = 'none';
         });
-    });
+
+        // فتح / إغلاق
+        row.style.display =
+            row.style.display === 'none' || row.style.display === ''
+                ? 'table-row'
+                : 'none';
+    }
+
+    /* ===============================
+       STATUS CHANGE
+    ================================ */
+    const statusSelect = e.target.closest('.order-status-select');
+    if (statusSelect) {
+
+        fetch('orders/update_status.php', {
+            method: 'POST',
+            body: new URLSearchParams({
+                id: statusSelect.dataset.id,
+                status: statusSelect.value
+            })
+        });
+    }
+
 });
-
-// MODAL
-const modal = document.getElementById('orderModal');
-const content = document.getElementById('orderModalContent');
-
-document.querySelectorAll('.orders-btn.view').forEach(btn => {
-    btn.onclick = () => {
-        modal.style.display = 'flex';
-        fetch('order_view.php?id=' + btn.dataset.id)
-            .then(r => r.text())
-            .then(html => content.innerHTML = html);
-    };
-});
-
-document.querySelector('.close-modal').onclick = () => {
-    modal.style.display = 'none';
-};

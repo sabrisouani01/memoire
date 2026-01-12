@@ -150,8 +150,8 @@ document.addEventListener("click", function (e) {
     fetch("/memoire/admin/products/delete.php?id=" + id)
         .then(res => res.text())
         .then(() => {
-            loadProducts(); // تحديث القائمة
-        });
+            loadProducts(); 
+         });
 });
 /* ================================
    حذف Customer (AJAX)
@@ -167,26 +167,6 @@ document.addEventListener("click", function (e) {
     if (!id) return;
 
     fetch("/memoire/admin/customers/delete.php?id=" + id)
-        .then(res => res.text())
-        .then(() => {
-            btn.closest("tr").remove();
-        });
-});
-
-/* ================================
-   حذف Customer (AJAX)
-================================ */
-document.addEventListener("click", function (e) {
-
-    const btn = e.target.closest(".delete-category");
-    if (!btn) return;
-
-    if (!confirm("Delete this category?")) return;
-
-    const id = btn.dataset.id;
-    if (!id) return;
-
-    fetch("/memoire/admin/categories/delete.php?id=" + id)
         .then(res => res.text())
         .then(() => {
             btn.closest("tr").remove();
