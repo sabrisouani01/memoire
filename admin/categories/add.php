@@ -2,7 +2,9 @@
 require "../includes/admin_auth.php";
 include "../../include/db_connect.php";
 
+$isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']);
 $message = '';
+$error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name_ar = trim($_POST['name_ar']);
@@ -16,14 +18,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("INSERT INTO categories (name_ar, name_fr, name_en) VALUES (?, ?, ?)");
             $stmt->execute([$name_ar, $name_fr, $name_en]);
 
-            header("Location: index.php");
-            exit;
+            $message = 'Category added successfully!';
         } catch (PDOException $e) {
             $message = "خطأ في الإدخال.";
             error_log("Category add error: " . $e->getMessage());
         }
     }
 }
+if ($isAjax && $message) {
+    echo $message;
+    
+    exit;}
 ?>
     <div class="category-container">
 
@@ -33,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="category-message" id="formMessage" style="display:none"></div>
 
-    <form id="addForm" class="category-form" method="post">
+    <form id="addForm" action= "categories/add.php" class="category-form" method="post">
 
         <div class="category-input">
             <input type="text" name="name_ar" required>

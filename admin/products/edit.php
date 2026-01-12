@@ -2,9 +2,9 @@
 require "../includes/admin_auth.php";
 include "../../include/db_connect.php";
 
-$isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH'])
-          && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
-
+$isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']);
+$message = '';
+$error = null;
 /* ================================
    التحقق من id
 ================================ */
@@ -35,7 +35,7 @@ $cats = $pdo->query("SELECT * FROM categories ORDER BY name_ar")->fetchAll();
 /* ================================
    تحديث المنتج
 ================================ */
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $name_ar  = trim($_POST['name_ar']);
     $name_en  = trim($_POST['name_en']);
@@ -75,12 +75,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         $image,
         $id
     ]);
-
-    if ($isAjax) {
-        echo "<div class='product-message'>success: product updated</div>";
-        exit;
-    }
+    $message = 'Product updated successfully!';
+    
 }
+if ($isAjax && $message) {
+    echo $message;
+    exit;}
 ?>
 
 <!-- ================================
@@ -96,10 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
 
     <div class="form-box product">
 
-        <form id="addForm"
-              method="post"
-              action="products/edit.php?id=<?= $product['id'] ?>"
-              enctype="multipart/form-data">
+        <form id = "addForm" action= "products/edit.php?id=<?= $product['id'] ?>" method= "POST">
 
             <div class="product-input">
                 <input type="text"

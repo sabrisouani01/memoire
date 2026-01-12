@@ -2,12 +2,11 @@
 require "../includes/admin_auth.php";
 include "../../include/db_connect.php";
 
-$isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH'])
-          && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
-
+$isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']);
+$message = '';
 $error = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $name_ar  = trim($_POST['name_ar']);
     $name_en  = trim($_POST['name_en']);
@@ -56,17 +55,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
             $category_id,
             $stock_quantity
         ]);
-
-        if ($isAjax) {
-            echo "<div class='product-message'>success: product added</div>";
-            exit;
-        }
-
-        header("Location: index.php");
-        exit;
+        $message = 'Product created successfully!';
     }
 }
-
+if ($isAjax && $message) {
+    echo $message;
+    exit;
+}
 $cats = $pdo->query("SELECT * FROM categories ORDER BY name_ar")->fetchAll();
 ?>
 
@@ -85,10 +80,7 @@ $cats = $pdo->query("SELECT * FROM categories ORDER BY name_ar")->fetchAll();
 
     <div class="form-box product">
 
-        <form id="addForm"
-              method="post"
-              action="products/add.php"
-              enctype="multipart/form-data">
+        <form id = "addForm" action= "products/add.php" method= "POST">
 
             <div class="product-input">
                 <input type="text" name="name_ar" required placeholder=" ">
@@ -140,7 +132,7 @@ $cats = $pdo->query("SELECT * FROM categories ORDER BY name_ar")->fetchAll();
                 <label>الصورة</label>
             </div>
 
-            <button type="submit" name="save" class="product-btn">
+            <button type="submit" class="product-btn">
                 <i class="fa-regular fa-floppy-disk"></i>
                 save
             </button>
