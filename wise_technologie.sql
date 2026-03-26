@@ -143,25 +143,51 @@ INSERT INTO `products` (`id`, `name_ar`, `name_fr`, `name_en`, `description_ar`,
 -- --------------------------------------------------------
 
 --
--- Table structure for table `repairs`
+-- Table structure for table `repair_orders`
+--
+CREATE TABLE repairs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  customer_name VARCHAR(255) NOT NULL,
+  phone VARCHAR(20),
+  item ENUM('phone','laptop','tablet','other') NOT NULL,
+  description TEXT,
+  status ENUM('pending','in_progress','completed','unrepairable','cancelled') 
+  DEFAULT 'pending',
+  technician varchar(255) DEFAULT NULL,
+  user_id INT,
+  product_id INT,
+  is_warranty_claim TINYINT(1) DEFAULT 0,
+  damage_from_factory TINYINT(1),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
+);
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `services`
 --
 
-CREATE TABLE `repairs` (
+CREATE TABLE `services` (
   `id` int(11) NOT NULL,
-  `customer_name` varchar(255) NOT NULL,
-  `phone` varchar(20) NOT NULL,
-  `item` varchar(100) NOT NULL COMMENT 'e.g., Phone, Laptop',
-  `description` text DEFAULT NULL,
-  `technician` varchar(255) DEFAULT NULL,
-  `status` enum('pending','in_progress','completed','unrepairable','cancelled') DEFAULT 'pending',
-  `user_id` int(11) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `is_warranty_claim` tinyint(1) DEFAULT 0,
-  `damage_from_factory` tinyint(1) DEFAULT NULL,
-  `product_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `name_ar` varchar(150) NOT NULL,
+  `name_fr` varchar(150) NOT NULL,
+  `name_en` varchar(150) NOT NULL,
+  `description_ar` text DEFAULT NULL,
+  `description_fr」 text DEFAULT NULL,
+  `description_en」 text DEFAULT NULL,
 
+    price DECIMAL(10,2) NOT NULL,
+    stock INT DEFAULT 0,
+    rom VARCHAR(50),
+    ram VARCHAR(50),
+    brand VARCHAR(100),
+    image VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 -- --------------------------------------------------------
 
 --

@@ -53,29 +53,34 @@ document.addEventListener("submit", function (e) {
     if (!e.target || e.target.tagName !== "FORM") return;
 
     
-    if (e.target.id !== "addForm") return;
+    if (e.target.id !== "addForm" && !e.target.classList.contains("ajax-form")) return;
 
-    
     if (e.target.method.toLowerCase() !== "post") return;
 
     e.preventDefault();
 
-  
-    fetch(e.target.action, {
+    // Use e.submitter so submit-button name/value (e.g. "accept") is included in FormData
+    const formData = new FormData(e.target, e.submitter || null);
+
+    fetch(e.target.action || window.location.href, {
         method: "POST",
         headers: { "X-Requested-With": "XMLHttpRequest" },
-        body: new FormData(e.target)
+        body: formData
     })
     .then(res => res.text())
     .then(msg => {
         const box = document.getElementById("formMessage");
-        if (!box) return;
+        if (box) {
+            box.innerHTML = msg;
+            box.style.display = "block";
+        }
 
-        box.innerHTML = msg;
-        box.style.display = "block";
-
-        if (msg.toLowerCase().includes("success")) {
+        if (msg.trim().toLowerCase() === "success") {
             e.target.reset();
+            // Refresh the dashboard after a successful accept action
+            if (e.target.classList.contains("ajax-form") || e.target.id === "addForm") {
+                loadPage("dashboard/dashbord.php");
+            }
         }
     })
     .catch(() => {
@@ -104,7 +109,6 @@ function loadProducts() {
             if (box) box.innerHTML = html;
         });
 }
-
 /* ================================
    events (delegation)
 ================================ */
@@ -171,4 +175,23 @@ document.addEventListener("click", function (e) {
         .then(() => {
             btn.closest("tr").remove();
         });
+});
+/* ================================
+   Repairs filter tabs (All / Active / Completed)
+================================ */
+document.addEventListener("click", function (e) {
+    const btn = e.target.closest(".tp-filter-btn");
+    if (!btn) return;
+
+    // Update active state on the tabs
+    document.querySelectorAll(".tp-filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const filter = btn.dataset.filter || "all";
+
+    // Re-use the same path the sidebar used to load this page
+    const currentPage = (document.querySelector(".sidebar-menu li.active") || {}).dataset?.page || "Repairs/index.php";
+    const basePath = currentPage.split("?")[0];
+
+    loadPage(basePath + "?filter=" + encodeURIComponent(filter));
 });
