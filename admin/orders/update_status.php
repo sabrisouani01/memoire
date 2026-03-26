@@ -10,9 +10,13 @@ if (!$id || !in_array($status, $allowed)) {
     echo json_encode(['success' => false]);
     exit;
 }
-
+if ($status === 'cancelled') {
+    $stmt = $pdo->prepare("DELETE FROM orders WHERE id=?");
+    $ok = $stmt->execute([$id]);
+}
+else {
 $stmt = $pdo->prepare("UPDATE orders SET status=? WHERE id=?");
-$ok = $stmt->execute([$status, $id]);
+$ok = $stmt->execute([$status, $id]);}
 
 echo json_encode(['success' => $ok]);
 ?>

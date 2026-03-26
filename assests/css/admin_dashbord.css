@@ -53,7 +53,8 @@
 .admin-dash-card.products .icon { background: #ff9f43; }
 .admin-dash-card.orders .icon { background: #ee5253; }
 .admin-dash-card.customers .icon { background: #1dd1a1; }
-
+.admin-dash-card.Repairs .icon { background: #3498db; }
+.admin-dash-card.Myorders .icon { background: #9b59b6; }
 /* INFO */
 .admin-dash-card .info span {
     font-size: 14px;
