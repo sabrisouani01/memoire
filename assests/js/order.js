@@ -74,3 +74,60 @@ document.addEventListener('change', function (e) {
         }
     });
 });
+
+/* ===============================
+   ACCEPT ORDER (technician claims a pending order)
+================================ */
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.tp-accept-btn');
+    if (!btn) return;
+
+    const id = btn.dataset.id;
+    if (!id) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Accepting…';
+
+    fetch('orders/index.php', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: new URLSearchParams({ accept_id: id })
+    })
+    .then(r => r.text())
+    .then(msg => {
+        if (msg.trim() === 'success') {
+            loadPage('orders/index.php');
+        } else {
+            btn.disabled = false;
+            btn.textContent = 'Accept';
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.textContent = 'Accept';
+    });
+});
+
+/* ===============================
+   DELETE SERVICE (technician removes a service)
+================================ */
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.tp-service-delete-btn');
+    if (!btn) return;
+
+    if (!confirm('Delete this service?')) return;
+
+    const id = btn.dataset.id;
+
+    fetch('services/delete.php', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: new URLSearchParams({ id: id })
+    })
+    .then(r => r.text())
+    .then(msg => {
+        if (msg.trim() === 'success') {
+            loadPage('services/index.php');
+        }
+    });
+});

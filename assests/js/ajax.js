@@ -190,8 +190,13 @@ document.addEventListener("click", function (e) {
     const filter = btn.dataset.filter || "all";
 
     // Re-use the same path the sidebar used to load this page
-    const currentPage = (document.querySelector(".sidebar-menu li.active") || {}).dataset?.page || "Repairs/index.php";
-    const basePath = currentPage.split("?")[0];
+    const activeLi = document.querySelector(".sidebar-menu li.active");
+    const currentPage = activeLi ? activeLi.dataset.page : "Repairs/index";
+    // Ensure .php extension for filter URLs
+    const base = currentPage.split("?")[0];
+    const basePath = base.endsWith(".php") ? base : base + ".php";
 
     loadPage(basePath + "?filter=" + encodeURIComponent(filter));
+    // Also keep sidebar item active
+    if (activeLi) activeLi.classList.add("active");
 });

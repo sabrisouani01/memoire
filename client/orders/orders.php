@@ -186,7 +186,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php endif; ?>
 
         <div class="actions">
-            <a href="../repairs/index.php" class="btn">طلب صيانة ضمن الضمان</a>
+            <a href="../repairs/submit_repair.php" class="btn">طلب صيانة ضمن الضمان</a>
             <a href="../index.php" class="btn">العودة</a>
             <a href="../auth/logout.php" class="btn logout">تسجيل الخروج</a>
         </div>
