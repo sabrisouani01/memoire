@@ -20,19 +20,20 @@ if (!$product_id || !$description) {
 
 require_once '../../include/db_connect.php';
 
-// Verify that this user actually bought this product and it's under warranty
+// ✅ Verify: user owns product + order is DELIVERED + warranty active
 $check = $pdo->prepare("
     SELECT o.warranty_expiry 
     FROM orders o
     JOIN order_items oi ON o.id = oi.order_id
     WHERE o.user_id = ? 
       AND oi.product_id = ?
+      AND o.status = 'delivered'           -- ✅ Critical: must be delivered
       AND o.warranty_expiry >= CURDATE()
 ");
 $check->execute([$user_id, $product_id]);
 
 if (!$check->fetch()) {
-    die("هذا المنتج غير مؤهل للصيانة تحت الضمان.");
+    die("هذا المنتج غير مؤهل للصيانة تحت الضمان (الطلب لم يُسلّم بعد أو انتهى الضمان).");
 }
 
 // Insert repair request as warranty claim

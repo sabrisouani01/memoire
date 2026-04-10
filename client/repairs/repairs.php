@@ -6,10 +6,9 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 require_once '../../include/db_connect.php';
-
 $user_id = $_SESSION['user_id'];
 
-// Get all orders with products that are still under warranty
+// ✅ ONLY delivered orders with active warranty
 $stmt = $pdo->prepare("
     SELECT 
         oi.id AS order_item_id,
@@ -21,6 +20,7 @@ $stmt = $pdo->prepare("
     JOIN order_items oi ON o.id = oi.order_id
     JOIN products p ON oi.product_id = p.id
     WHERE o.user_id = ? 
+      AND o.status = 'delivered'           -- ✅ Must be delivered
       AND o.warranty_expiry IS NOT NULL 
       AND o.warranty_expiry >= CURDATE()
     ORDER BY o.created_at DESC
@@ -28,7 +28,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $warrantyItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get past repair requests
+// Past repair requests
 $repairsStmt = $pdo->prepare("
     SELECT 
         r.id, 
@@ -52,7 +52,7 @@ $repairs = $repairsStmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>طلبات الصيانة</title>
-    <link rel="stylesheet" href="../../assets/css/user.css">
+    <link rel="stylesheet" href="../../assests/css/user.css">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -118,7 +118,7 @@ $repairs = $repairsStmt->fetchAll(PDO::FETCH_ASSOC);
         button[type="submit"]:hover {
             background: #0b5ed7;
         }
-        .repair-item {
+                .repair-item {
             padding-bottom: 15px;
             border-bottom: 1px dashed #eee;
         }
