@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: index.php");
+    header("Location: repairs.php");
     exit();
 }
 
@@ -15,39 +15,57 @@ $product_id = $_POST['product_id'] ?? null;
 $description = trim($_POST['description'] ?? '');
 
 if (!$product_id || !$description) {
-    die("يرجى تعبئة جميع الحقول.");
+    // Redirect back with error
+    header("Location: repairs.php?error=missing_fields");
+    exit();
 }
 
 require_once '../../include/db_connect.php';
 
-// ✅ Verify: user owns product + order is DELIVERED + warranty active
+// ✅ Verify: user owns product + order is DELIVERED
 $check = $pdo->prepare("
     SELECT o.warranty_expiry 
     FROM orders o
     JOIN order_items oi ON o.id = oi.order_id
     WHERE o.user_id = ? 
       AND oi.product_id = ?
-      AND o.status = 'delivered'           -- ✅ Critical: must be delivered
-      AND o.warranty_expiry >= CURDATE()
+      AND o.status = 'delivered'
 ");
 $check->execute([$user_id, $product_id]);
+$order = $check->fetch();
 
-if (!$check->fetch()) {
-    die("هذا المنتج غير مؤهل للصيانة تحت الضمان (الطلب لم يُسلّم بعد أو انتهى الضمان).");
+if (!$order) {
+    header("Location: repairs.php?error=not_eligible");
+    exit();
 }
 
-// Insert repair request as warranty claim
-$insert = $pdo->prepare("
-    INSERT INTO repairs (
-        user_id, 
-        product_id, 
-        description, 
-        status, 
-        is_warranty_claim,
-        created_at
-    ) VALUES (?, ?, ?, 'pending', 1, NOW())
-");
-$insert->execute([$user_id, $product_id, $description]);
+// Determine if it's a warranty claim
+$isWarrantyClaim = 0;
+if ($order['warranty_expiry'] && strtotime($order['warranty_expiry']) >= time()) {
+    $isWarrantyClaim = 1;
+}
 
-header("Location: index.php?success=1");
-exit();
+// Insert repair request
+try {
+    $insert = $pdo->prepare("
+        INSERT INTO repairs (
+            user_id, 
+            product_id, 
+            description, 
+            status, 
+            is_warranty_claim,
+            created_at
+        ) VALUES (?, ?, ?, 'pending', ?, NOW())
+    ");
+    $insert->execute([$user_id, $product_id, $description, $isWarrantyClaim]);
+    
+    // ✅ Success - redirect to repairs page with success flag
+    header("Location: repairs.php?success=1");
+    exit();
+    
+} catch (PDOException $e) {
+    // ✅ Error - redirect with error message
+    error_log("Repair insert error: " . $e->getMessage());
+    header("Location: repairs.php?error=database");
+    exit();
+}
