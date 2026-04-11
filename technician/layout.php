@@ -6,7 +6,7 @@ require "includes/tech_auth.php";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>admin panel</title>
+    <title>Technician panel</title>
     <link rel="stylesheet" href="../assests/css/header.css">
     <link rel="stylesheet" href="../assests/css/admin_sidebar.css">
     <link rel="stylesheet" href="../assests/css/admin_dashbord.css">

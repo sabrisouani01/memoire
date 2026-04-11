@@ -81,10 +81,9 @@ $statusColors = [
 
     <!-- Filter tabs -->
     <div class="tp-filter-tabs">
-        <button class="tp-tab <?= $filter==='all'      ?'active':'' ?>" onclick="loadPage('Repairs/index.php?filter=all')">All</button>
-        <button class="tp-tab <?= $filter==='active'   ?'active':'' ?>" onclick="loadPage('Repairs/index.php?filter=active')">Active</button>
-        <button class="tp-tab <?= $filter==='completed'?'active':'' ?>" onclick="loadPage('Repairs/index.php?filter=completed')">Completed</button>
-        
+        <button class="tp-tab tp-filter-btn <?= $filter==='all'      ?'active':'' ?>" data-filter="all">All</button>
+        <button class="tp-tab tp-filter-btn <?= $filter==='active'   ?'active':'' ?>" data-filter="active">Active</button>
+        <button class="tp-tab tp-filter-btn <?= $filter==='completed'?'active':'' ?>" data-filter="completed">Completed</button>
     </div>
 
     <div class="tp-table-wrap">
