@@ -6,7 +6,6 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 require_once '../../include/db_connect.php';
-
 $user_id = $_SESSION['user_id'];
 
 $stmt = $pdo->prepare("
@@ -66,6 +65,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .orders-table td {
             padding: 14px;
             border-bottom: 1px solid #e0e0e0;
+            vertical-align: middle;
         }
         .orders-table th {
             background-color: #f1f3f5;
@@ -91,10 +91,16 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .actions {
             text-align: center;
             margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
         }
         .btn {
-            display: inline-block;
-            margin: 0 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
             padding: 10px 20px;
             background: #0d6efd;
             color: white;
@@ -103,15 +109,41 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
             font-weight: bold;
             transition: background 0.2s;
         }
-        .btn:hover {
-            background: #0b5ed7;
-        }
-        .btn.logout {
+        .btn:hover { background: #0b5ed7; }
+        .btn-primary { background: #198754; }
+        .btn-primary:hover { background: #157347; }
+
+        /* ✅ Delete Button Styles */
+        .btn-delete {
             background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
-        .btn.logout:hover {
-            background: #c82333;
+        .btn-delete:hover { background: #c82333; }
+        .action-disabled {
+            color: #999;
+            font-size: 13px;
+            font-style: italic;
         }
+
+        /* ✅ Alert Styles */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        .alert-success { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .alert-error { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
+
         .empty-message {
             text-align: center;
             color: #6c757d;
@@ -119,23 +151,34 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
             padding: 30px;
         }
 
-        @media (max-width: 600px) {
-            .orders-table th,
-            .orders-table td {
-                padding: 10px 8px;
-                font-size: 14px;
-            }
-            .actions .btn {
-                display: block;
-                margin: 8px auto;
-                width: 80%;
-            }
+        @media (max-width: 768px) {
+            .orders-table th, .orders-table td { padding: 10px 8px; font-size: 14px; }
+            .orders-table { display: block; overflow-x: auto; }
+            .actions { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>طلباتي</h2>
+        
+        <!-- ✅ Alert Messages -->
+        <?php if (isset($_GET['deleted']) && $_GET['deleted'] == 1): ?>
+            <div class="alert alert-success">✅ تم إلغاء وحذف الطلب بنجاح.</div>
+        <?php elseif (isset($_GET['error'])): ?>
+            <?php
+            $errorMessages = [
+                'invalid' => '❌ طلب غير صالح.',
+                'unauthorized' => '❌ غير مسموح لك بحذف هذا الطلب.',
+                'status' => '❌ لا يمكن حذف الطلبات التي تم معالجتها أو تسليمها.',
+                'failed' => '❌ فشل حذف الطلب. يرجى المحاولة لاحقاً.'
+            ];
+            $errorMsg = $errorMessages[$_GET['error']] ?? '❌ حدث خطأ غير معروف.';
+            ?>
+            <div class="alert alert-error"><?= htmlspecialchars($errorMsg) ?></div>
+        <?php endif; ?>
+
+        <h2>📦 طلباتي</h2>
 
         <?php if (empty($orders)): ?>
             <div class="empty-message">ليس لديك طلبات حتى الآن.</div>
@@ -143,12 +186,13 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <table class="orders-table">
                 <thead>
                     <tr>
-                        <th>رقم الطلب</th>
-                        <th>المنتجات</th>
-                        <th>المبلغ</th>
-                        <th>الحالة</th>
-                        <th>تاريخ الطلب</th>
-                        <th>نهاية الضمان</th>
+                        <th>📋 رقم الطلب</th>
+                        <th>📦 المنتجات</th>
+                        <th>💰 المبلغ</th>
+                        <th>🔄 الحالة</th>
+                        <th>📅 تاريخ الطلب</th>
+                        <th>🛡️ نهاية الضمان</th>
+                        <th>⚙️ الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -179,6 +223,18 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 —
                             <?php endif; ?>
                         </td>
+                        <td>
+                            <!-- ✅ DELETE BUTTON (Only for pending orders) -->
+                            <?php if ($order['status'] === 'pending'): ?>
+                                <form action="delete_order.php" method="POST" style="display:inline;" 
+                                      onsubmit="return confirm('⚠️ هل أنت متأكد من إلغاء وحذف هذا الطلب؟\nلا يمكن التراجع عن هذا الإجراء.');">
+                                    <input type="hidden" name="order_id" value="<?= $order['order_id'] ?>">
+                                    <button type="submit" class="btn-delete">🗑️ حذف</button>
+                                </form>
+                            <?php else: ?>
+                                <span class="action-disabled">🔒 غير متاح</span>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -186,10 +242,18 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php endif; ?>
 
         <div class="actions">
-            <a href="../repairs/submit_repair.php" class="btn">طلب صيانة ضمن الضمان</a>
-            <a href="../index.php" class="btn">العودة</a>
-            <a href="../auth/logout.php" class="btn logout">تسجيل الخروج</a>
+            <a href="../repairs/repairs.php" class="btn btn-primary">🔧 طلب صيانة</a>
+            <a href="../index.php" class="btn">🏠 العودة</a>
         </div>
     </div>
+
+    <script>
+        // Clean URL after showing message
+        if (window.location.search.includes('deleted=1') || window.location.search.includes('error=')) {
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.pathname);
+            }
+        }
+    </script>
 </body>
 </html>
