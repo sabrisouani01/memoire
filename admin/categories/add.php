@@ -10,13 +10,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name_ar = trim($_POST['name_ar']);
     $name_fr = trim($_POST['name_fr']);
     $name_en = trim($_POST['name_en']);
-
-    if (empty($name_ar) || empty($name_fr) || empty($name_en)) {
+    $warranty = trim($_POST['warranty_duration'] ?? '');
+if (empty($name_ar) || empty($name_fr) || empty($name_en) || empty($warranty)) {
         $message = "جميع الحقول مطلوبة.";
     } else {
         try {
-            $stmt = $pdo->prepare("INSERT INTO categories (name_ar, name_fr, name_en) VALUES (?, ?, ?)");
-            $stmt->execute([$name_ar, $name_fr, $name_en]);
+            $stmt = $pdo->prepare("
+    INSERT INTO categories (name_ar, name_fr, name_en, warranty_duration)
+    VALUES (?, ?, ?, ?)
+");
+
+$stmt->execute([$name_ar, $name_fr, $name_en, $warranty]);
 
             $message = 'Category added successfully!';
         } catch (PDOException $e) {
@@ -53,6 +57,11 @@ if ($isAjax && $message) {
         <div class="category-input">
             <input type="text" name="name_en" required>
             <label>Name (English)</label>
+        </div>
+
+        <div class="category-input">
+    <input type="text" name="warranty_duration">
+    <label>مدة الضمان</label>
         </div>
 
         <button type="submit" class="category-btn primary">
