@@ -242,8 +242,14 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php endif; ?>
 
         <div class="actions">
+<<<<<<< HEAD
+            <a href="../repairs/submit_repair.php" class="btn">طلب صيانة ضمن الضمان</a>
+            <a href="../index.php" class="btn">العودة</a>
+            <a href="../auth/logout.php" class="btn logout">تسجيل الخروج</a>
+=======
             <a href="../repairs/repairs.php" class="btn btn-primary">🔧 طلب صيانة</a>
             <a href="../index.php" class="btn">🏠 العودة</a>
+>>>>>>> 0a784a929cb4de71b215d1fdb2a902df85cf4787
         </div>
     </div>
 

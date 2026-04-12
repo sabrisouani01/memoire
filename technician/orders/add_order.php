@@ -106,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
 
+        loadPage('orders/add_order', {
         fetch('orders/add_order.php', {
             method: 'POST',
             body: new FormData(form)

@@ -129,6 +129,7 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
+<!-- addServiceForm submit is handled by order.js (inline scripts don't execute in innerHTML) -->
 <script>
 document.getElementById('addServiceForm').addEventListener('submit', function(e) {
     e.preventDefault();
