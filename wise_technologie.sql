@@ -53,9 +53,9 @@ CREATE TABLE `categories` (
 -- Dumping data for table `categories`
 --
 
-INSERT INTO `categories` (`id`, `name_ar`, `name_fr`, `name_en`, `created_at`) VALUES
-(1, 'الهواتف', 'Téléphones', 'Phones', '2025-08-25 21:08:59'),
-(2, 'لابتوبات', 'Ordinateurs portables', 'Laptops', '2025-08-25 21:08:59');
+INSERT INTO `categories`(`id`, `name_ar`, `name_fr`, `name_en`, `created_at`, `warranty_duration`) VALUES
+(1, 'الهواتف', 'Téléphones', 'Phones', '2025-08-25 21:08:59','9 اشهر'),
+(2, 'لابتوبات', 'Ordinateurs portables', 'Laptops', '2025-08-25 21:08:59','12 شهر');
 
 -- --------------------------------------------------------
 
@@ -438,6 +438,8 @@ ALTER TABLE `repairs`
 ALTER TABLE `warranty_rules`
   ADD CONSTRAINT `warranty_rules_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE;
 COMMIT;
+ALTER TABLE categories 
+ADD warranty_duration VARCHAR(50) NULL;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

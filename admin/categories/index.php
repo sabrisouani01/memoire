@@ -28,6 +28,7 @@ $categories = $pdo->query("
                 <th>Arabic</th>
                 <th>French</th>
                 <th>English</th>
+                <th>Warranty</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -43,6 +44,8 @@ $categories = $pdo->query("
                     <td><?= htmlspecialchars($cat['name_fr']) ?></td>
 
                     <td><?= htmlspecialchars($cat['name_en']) ?></td>
+                    
+                    <td><?= htmlspecialchars($cat['warranty_duration'] ?? '-') ?></td>
 
                     <td>
                         <div class="categories-actions">

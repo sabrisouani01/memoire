@@ -140,3 +140,14 @@ document.addEventListener("click", function (e) {
     if (activeLi) activeLi.classList.add("active");
 });
 
+    // Re-use the same path the sidebar used to load this page
+    const activeLi = document.querySelector(".sidebar-menu li.active");
+    const currentPage = activeLi ? activeLi.dataset.page : "Repairs/index";
+    // Ensure .php extension for filter URLs
+    const base = currentPage.split("?")[0];
+    const basePath = base.endsWith(".php") ? base : base + ".php";
+
+    loadPage(basePath + "?filter=" + encodeURIComponent(filter));
+    // Also keep sidebar item active
+    if (activeLi) activeLi.classList.add("active");
+});

@@ -31,6 +31,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 ?>
+<div class="tp-page">
+    <div class="tp-page-header">
+        <h2 class="tp-title"><i class="fa-solid fa-plus-circle"></i> Add New Order</h2>
+    </div>
+
+    <div style="background:#fff;border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,0.07);padding:32px;max-width:560px;">
+        <div id="addOrderMsg" style="display:none;margin-bottom:16px;padding:12px 16px;border-radius:10px;font-size:14px;"></div>
+
+        <form id="addOrderForm" style="display:flex;flex-direction:column;gap:18px;">
+
+            <div>
+                <label style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;">
+                    Customer Name <span style="color:#ef4444;">*</span>
+                </label>
+                <input name="customer_name" required placeholder="Full name"
+                    style="width:100%;padding:11px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;box-sizing:border-box;transition:border-color .2s;"
+                    onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'">
+            </div>
+
+            <div>
+                <label style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;">
+                    Phone Number <span style="color:#ef4444;">*</span>
+                </label>
+                <input name="phone" required placeholder="e.g. 0550 123 456"
+                    style="width:100%;padding:11px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;box-sizing:border-box;transition:border-color .2s;"
+                    onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'">
+            </div>
+
+            <div>
+                <label style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;">
+                    Item / Device <span style="color:#ef4444;">*</span>
+                </label>
+                <input name="item" required placeholder="e.g. iPhone 14, Samsung TV…"
+                    style="width:100%;padding:11px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;box-sizing:border-box;transition:border-color .2s;"
+                    onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'">
+            </div>
+
+            <div>
+                <label style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;">
+                    Description / Issue
+                </label>
+                <textarea name="description" rows="4" placeholder="Describe the problem or work needed…"
+                    style="width:100%;padding:11px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;resize:vertical;box-sizing:border-box;transition:border-color .2s;font-family:inherit;"
+                    onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:4px;">
+                <button type="submit" id="addOrderSubmitBtn"
+                    style="flex:1;background:#2563eb;color:#fff;border:none;padding:13px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s;">
+                    <i class="fa-solid fa-plus"></i> Create Order
+                </button>
+                <button type="button" onclick="loadPage('orders/index.php')"
+                    style="background:#f1f5f9;color:#64748b;border:none;padding:13px 20px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;">
+                    Cancel
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
 <script>
 (function() {
     const form = document.getElementById('addOrderForm');
@@ -46,6 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
 
         loadPage('orders/add_order', {
+        fetch('orders/add_order.php', {
             method: 'POST',
             body: new FormData(form)
         })

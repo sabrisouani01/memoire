@@ -130,3 +130,36 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <!-- addServiceForm submit is handled by order.js (inline scripts don't execute in innerHTML) -->
+<script>
+document.getElementById('addServiceForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const msg  = document.getElementById('addServiceMsg');
+    const btn  = form.querySelector('button[type=submit]');
+    btn.disabled = true; btn.textContent = 'Saving…';
+
+    fetch('services/add.php', {
+        method: 'POST',
+        body: new FormData(form)
+    })
+    .then(r => r.text())
+    .then(res => {
+        if (res.trim() === 'success') {
+            document.getElementById('addServiceModal').style.display = 'none';
+            form.reset();
+            loadPage('services/index.php');
+        } else {
+            msg.style.display = 'block';
+            msg.style.background = '#fee2e2';
+            msg.style.color = '#dc2626';
+            msg.textContent = res || 'Something went wrong.';
+        }
+        btn.disabled = false; btn.textContent = '＋ Add Service';
+    })
+    .catch(() => {
+        msg.style.display = 'block';
+        msg.textContent = 'Server error.';
+        btn.disabled = false; btn.textContent = '＋ Add Service';
+    });
+});
+</script>
