@@ -2,24 +2,6 @@
 require "../includes/tech_auth.php";
 include "../../include/db_connect.php";
 
-// Handle accept action
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['repair_id'])) {
-    $repair_id = (int) $_POST['repair_id'];
-    $stmt = $pdo->prepare("UPDATE repairs SET status = 'in_progress', technician = ? WHERE id = ?");
-    $stmt->execute([$_SESSION['username'], $repair_id]);
-
-    $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-
-    if ($isAjax) {
-        echo 'success';
-        exit;
-    }
-
-    // Redirect to refresh the page (normal navigation)
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit;
-}
-
 // Count services
 $stmt = $pdo->query("SELECT COUNT(*) AS total FROM services");
 $count_services = $stmt->fetch()['total'];
@@ -130,10 +112,13 @@ $recent_orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </td>
                     <td>
                         <?php if ($order['status'] == 'pending'): ?>
-                            <form class="ajax-form" method="post" action="dashboard/dashbord" style="display:inline;">
-                                <input type="hidden" name="repair_id" value="<?= $order['id'] ?>">
-                                <button type="submit" name="accept" class="btn btn-primary">Accept</button>
-                            </form>
+                            <button class="tp-accept-btn"
+                                    data-id="<?= $order['id'] ?>"
+                                    data-reload="dashboard/dashbord.php"
+                                    title="Accept this order"
+                                    style="background:#2563eb;color:#fff;border:none;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:13px;">
+                                Accept
+                            </button>
                         <?php else: ?>
                             -
                         <?php endif; ?>
