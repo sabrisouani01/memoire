@@ -38,7 +38,7 @@ $products = $pdo->query("
                 <option value="out">Out of stock</option>
             </select>
 
-            <a href="#" data-page="products/add" class="ajax-link btn-add22">
+            <a href="#" data-page="products/add.php" class="ajax-link btn-add22">
                 <i class="fa-solid fa-plus"></i> Add product
             </a>
         </div>
@@ -73,7 +73,7 @@ $products = $pdo->query("
                 <a href="#" class="ajax-link" data-page="products/edit.php" data-id="<?=$p['id']?>" title="Edit">
                     <i class="fa-solid fa-pen" ></i>
                 </a>
-                <a href="#" class="delete-product" data-page="prodects/delete" data-id="<?=$p['id']?>" title="Remove">
+                <a href="#" class="delete-product" data-page="products/delete.php" data-id="<?=$p['id']?>" title="Remove">
                     <i class="fa-solid fa-trash"></i>
                 </a>
             </div>

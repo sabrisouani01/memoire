@@ -104,6 +104,7 @@ document.addEventListener('change', function (e) {
 /* ===============================
    ADD SERVICE FORM
    (inline scripts don't execute inside innerHTML)
+================================ */
 document.addEventListener('submit', function (e) {
     const form = e.target;
     if (form.id !== 'addServiceForm') return;
@@ -132,6 +133,7 @@ document.addEventListener('submit', function (e) {
 
 /* ===============================
    ADD ORDER FORM (modal in orders/index.php)
+================================ */
 document.addEventListener('submit', function (e) {
     const form = e.target;
     if (form.id !== 'addOrderForm') return;
@@ -159,56 +161,5 @@ document.addEventListener('submit', function (e) {
         msg.textContent = 'Server error. Please try again.';
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-plus"></i> Create Order';
-   ACCEPT ORDER (technician claims a pending order)
-document.addEventListener('click', function (e) {
-    const btn = e.target.closest('.tp-accept-btn');
-    if (!btn) return;
-
-    const id = btn.dataset.id;
-    if (!id) return;
-
-    btn.disabled = true;
-    btn.textContent = 'Accepting…';
-
-    fetch('orders/index.php', {
-        method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        body: new URLSearchParams({ accept_id: id })
-    })
-    .then(r => r.text())
-    .then(msg => {
-        if (msg.trim() === 'success') {
-            loadPage('orders/index.php');
-        } else {
-            btn.disabled = false;
-            btn.textContent = 'Accept';
-        }
-    })
-    .catch(() => {
-        btn.disabled = false;
-        btn.textContent = 'Accept';
-    });
-});
-
-/* ===============================
-   DELETE SERVICE (technician removes a service)
-document.addEventListener('click', function (e) {
-    const btn = e.target.closest('.tp-service-delete-btn');
-    if (!btn) return;
-
-    if (!confirm('Delete this service?')) return;
-
-    const id = btn.dataset.id;
-
-    fetch('services/delete.php', {
-        method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        body: new URLSearchParams({ id: id })
-    })
-    .then(r => r.text())
-    .then(msg => {
-        if (msg.trim() === 'success') {
-            loadPage('services/index.php');
-        }
     });
 });

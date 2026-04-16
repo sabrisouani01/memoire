@@ -139,7 +139,7 @@ $cats = $pdo->query("SELECT * FROM categories ORDER BY name_ar")->fetchAll();
 
             <button type="button"
                     class="product-btn secondary ajax-link"
-                    data-page="products/index">
+                    data-page="products/index.php">
                 <i class="fa-solid fa-backward"></i>
                 back
             </button>

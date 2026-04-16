@@ -17,21 +17,12 @@ require "includes/admin_auth.php";
     <link rel="stylesheet" href="../assests/css/customers.css">
     <link rel="stylesheet" href="../assests/css/categorie.css">
     <link rel="stylesheet" href="../assests/css/add_cat.css">
+    <link rel="stylesheet" href="../assests/css/responsive.css">
 </head>
-<style>
-    .content{
-        margin-left: 260px;
-        margin-top: 64px;
-        height: 64px;
-        padding: 30px;
-        min-height: 100vh;
-        box-sizing: border-box;
-    }
-</style>
 <body>
     <?php
     include "includes/header.php";
-    include "includes/sidebar.php";?> 
+    include "includes/sidebar.php";?>
     <div class="content" id="content"></div>
     <script src="../assests/js/ajax.js"></script>
     <script src="../assests/js/header.js"></script>
@@ -39,4 +30,3 @@ require "includes/admin_auth.php";
     <script src="https://kit.fontawesome.com/4060ace190.js" crossorigin="anonymous"></script>
 </body>
 </html>
-

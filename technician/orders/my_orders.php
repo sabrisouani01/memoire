@@ -72,9 +72,6 @@ $statusColors = [
                 onclick="loadPage('orders/my_orders.php?status=in_progress')">
             In Progress
         </button>
-        <button class="tp-tab <?= $statusFilter==='completed'?'active':'' ?>"
-            Completed
-        </button>
     </div>
 
     <div class="tp-table-wrap">

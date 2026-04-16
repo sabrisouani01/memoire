@@ -149,6 +149,7 @@ elseif ($action === 'register') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wise Tech - Next Generation</title>
     <link rel="stylesheet" href="../assests/css/login.css">
+    <link rel="stylesheet" href="../assests/css/responsive.css">
     <script src="https://kit.fontawesome.com/4060ace190.js" crossorigin="anonymous"></script>
 </head>
 <body>

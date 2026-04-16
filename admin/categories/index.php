@@ -16,7 +16,7 @@ $categories = $pdo->query("
             <i class="fa-solid fa-folder-open"></i> Categories
         </h2>
 
-        <a href="#" data-page="categories/add" class="categories-add ajax-link">
+        <a href="#" data-page="categories/add.php" class="categories-add ajax-link">
             <i class="fa-solid fa-plus"></i> Add Category
         </a>
     </div>
@@ -51,7 +51,7 @@ $categories = $pdo->query("
                         <div class="categories-actions">
                             <a href="#"
                                class="categories-btn delete delete-category"
-                               data-page="categories/delete"
+                               data-page="categories/delete.php"
                                data-id="<?= $cat['id'] ?>"
                                title="Delete">
                                 <i class="fa-solid fa-trash"></i>
