@@ -1,4 +1,8 @@
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 <header class="admin-header">
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">
+        <i class="fa-solid fa-bars"></i>
+    </button>
     <div class="header-left">
         <!-- ADD NEW -->
           <div class="dropdown">
@@ -8,11 +12,11 @@
             </button>
 
             <div class="dropdown-menu right" id="addDropdown">
-                <a href="#" onclick="loadPage('users/add_admin')">
+                <a href="#" onclick="loadPage('users/add_admin.php')">
                     <i class="fa-solid fa-user-shield"></i>
                    Add Admin
                 </a>
-                <a href="#" onclick="loadPage('users/add_technician')">
+                <a href="#" onclick="loadPage('users/add_technician.php')">
                     <i class="fa-solid fa-screwdriver-wrench"></i>
                     Add Technician
                 </a>

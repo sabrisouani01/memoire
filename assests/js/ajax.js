@@ -28,12 +28,11 @@ document.addEventListener("click", function (e) {
     loadPage(li.dataset.page);
 });
 
-
 /* ================================
    Load dashboard on first visit
 ================================ */
 document.addEventListener("DOMContentLoaded", function () {
-    loadPage("dashboard/dashbord");
+    loadPage("dashboard/dashbord.php");
 });
 
 /* ================================
@@ -56,7 +55,7 @@ document.addEventListener("submit", function (e) {
         if (box) { box.innerHTML = msg; box.style.display = "block"; }
         if (msg.trim().toLowerCase() === "success") {
             e.target.reset();
-            loadPage("dashboard/dashbord");
+            loadPage("dashboard/dashbord.php");
         }
     })
     .catch(() => {
@@ -114,6 +113,7 @@ document.addEventListener("click", function (e) {
     fetch("/memoire/admin/customers/delete.php?id=" + btn.dataset.id)
         .then(() => { btn.closest("tr").remove(); });
 });
+
 /* ================================
    Filter tabs — Repairs (All / Active / Completed)
    and any other page with .tp-filter-btn
@@ -137,17 +137,5 @@ document.addEventListener("click", function (e) {
     loadPage(basePath + "?filter=" + encodeURIComponent(filter));
 
     // Keep sidebar item highlighted after reload
-    if (activeLi) activeLi.classList.add("active");
-});
-
-    // Re-use the same path the sidebar used to load this page
-    const activeLi = document.querySelector(".sidebar-menu li.active");
-    const currentPage = activeLi ? activeLi.dataset.page : "Repairs/index";
-    // Ensure .php extension for filter URLs
-    const base = currentPage.split("?")[0];
-    const basePath = base.endsWith(".php") ? base : base + ".php";
-
-    loadPage(basePath + "?filter=" + encodeURIComponent(filter));
-    // Also keep sidebar item active
     if (activeLi) activeLi.classList.add("active");
 });

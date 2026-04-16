@@ -1,4 +1,8 @@
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 <header class="admin-header">
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">
+        <i class="fa-solid fa-bars"></i>
+    </button>
     <div class="header-left">
         <!-- USER -->
         <div class="dropdown">

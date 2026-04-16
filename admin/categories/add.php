@@ -71,7 +71,7 @@ if ($isAjax && $message) {
 
         <button type="button"
                 class="category-btn secondary ajax-link"
-                data-page="categories/index">
+                data-page="categories/index.php">
             <i class="fa-solid fa-backward"></i>
                 back
         </button>
