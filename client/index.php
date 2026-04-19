@@ -12,6 +12,7 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username']) : 'زائر';
     <link rel="stylesheet" href="../assests/css/user.css" />
     <script src="https://kit.fontawesome.com/4060ace190.js" crossorigin="anonymous"></script>
 </head>
+
 <body>
 
 <!-- ===== Navbar ===== -->

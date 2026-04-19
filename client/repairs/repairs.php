@@ -8,18 +8,21 @@ if (!isset($_SESSION['user_id'])) {
 require_once '../../include/db_connect.php';
 $user_id = $_SESSION['user_id'];
 
-// ✅ ALL delivered orders (no warranty filter)
+// ✅ Get delivered orders with warranty info
 $stmt = $pdo->prepare("
     SELECT 
         oi.id AS order_item_id,
         o.id AS order_id,
         p.id AS product_id,
         p.name_ar AS product_name,
+        p.category_id,
         o.warranty_expiry,
-        o.status
+        c.warranty_duration,
+        o.created_at AS order_date
     FROM orders o
     JOIN order_items oi ON o.id = oi.order_id
     JOIN products p ON oi.product_id = p.id
+    JOIN categories c ON p.category_id = c.id
     WHERE o.user_id = ? 
       AND o.status = 'delivered'
     ORDER BY o.created_at DESC
@@ -35,7 +38,8 @@ $repairsStmt = $pdo->prepare("
         r.description, 
         r.status, 
         r.created_at,
-        r.is_warranty_claim
+        r.is_warranty_claim,
+        r.is_external_item
     FROM repairs r
     LEFT JOIN products p ON r.product_id = p.id
     WHERE r.user_id = ?
@@ -51,180 +55,43 @@ $repairs = $repairsStmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>طلبات الصيانة</title>
-    <link rel="stylesheet" href="../../assests/css/user.css">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            padding: 20px;
-            margin: 0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        h2, h3 {
-            color: #333;
-            margin: 20px 0 15px;
-        }
-        h2 {
-            text-align: center;
-            font-size: 24px;
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            border: 1px solid #e9ecef;
-        }
-        label {
-            display: block;
-            margin: 12px 0 6px;
-            font-weight: bold;
-            color: #495057;
-        }
-        select, textarea, input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            font-size: 15px;
-            direction: rtl;
-            box-sizing: border-box;
-        }
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-        button[type="submit"] {
-            background: #0d6efd;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            transition: background 0.2s;
-        }
-        button[type="submit"]:hover {
-            background: #0b5ed7;
-        }
-        .repair-item {
-            padding-bottom: 15px;
-            border-bottom: 1px dashed #eee;
-            margin-bottom: 15px;
-        }
-        .repair-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-            margin-bottom: 0;
-        }
-        .repair-item p {
-            margin: 6px 0;
-            line-height: 1.5;
-        }
-        .status-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-            background: #e9ecef;
-            color: #495057;
-        }
-        .alert {
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-        .alert-success {
-            background: #d1e7dd;
-            color: #0f5132;
-            border: 1px solid #badbcc;
-        }
-        .alert-error {
-            background: #f8d7da;
-            color: #842029;
-            border: 1px solid #f5c2c7;
-        }
-        .delete-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 6px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: background 0.2s;
-            width: auto;
-            margin-top: 8px;
-        }
-        .delete-btn:hover {
-            background: #bb2d3b;
-        }
-        .repair-note {
-            color: #6c757d;
-            font-size: 13px;
-            margin-top: 8px;
-            font-style: italic;
-        }
-        .empty-message {
-            text-align: center;
-            color: #6c757d;
-            font-style: italic;
-            padding: 20px 0;
-        }
-        .nav-links {
-            text-align: center;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-        }
-        .nav-links a {
-            text-decoration: none;
-            font-weight: bold;
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-        .nav-home {
-            background: #198754;
-            color: white !important;
-        }
-        .nav-home:hover {
-            background: #157347;
-        }
-        .nav-orders {
-            color: #0d6efd;
-        }
-        .nav-orders:hover {
-            text-decoration: underline;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background: #f5f5f5; padding: 20px; direction: rtl; }
+        .container { max-width: 900px; margin: auto; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2, h3 { color: #333; margin: 20px 0 15px; text-align: center; }
+        .card { background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
+        .tab-btn { padding: 10px 20px; border: 2px solid #0d6efd; background: #fff; color: #0d6efd; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .tab-btn.active, .tab-btn:hover { background: #0d6efd; color: #fff; }
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+        label { display: block; margin: 12px 0 6px; font-weight: bold; color: #444; }
+        select, textarea, input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; direction: rtl; }
+        textarea { min-height: 80px; resize: vertical; }
+        button[type="submit"] { background: #0d6efd; color: #fff; border: none; padding: 12px 20px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        button[type="submit"]:hover { background: #0b5ed7; }
+        .repair-item { padding: 15px 0; border-bottom: 1px dashed #eee; }
+        .repair-item:last-child { border-bottom: none; }
+        .repair-item p { margin: 5px 0; font-size: 14px; }
+        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; background: #e9ecef; color: #495057; }
+        .warranty-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-right: 8px; }
+        .warranty-active { background: #d4edda; color: #155724; }
+        .warranty-expired { background: #f8d7da; color: #721c24; }
+        .warranty-none { background: #fff3cd; color: #856404; }
+        .alert { padding: 12px; border-radius: 6px; margin-bottom: 15px; font-weight: 500; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .empty-message { text-align: center; color: #666; font-style: italic; padding: 20px; }
+        .nav-links { text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee; }
+        .nav-links a { display: inline-block; margin: 0 10px; text-decoration: none; color: #0d6efd; font-weight: bold; }
+        .delete-btn { background: #dc3545; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; margin-top: 8px; }
+        .delete-btn:hover { background: #c82333; }
+        .action-disabled { color: #999; font-size: 13px; font-style: italic; }
         @media (max-width: 600px) {
-            .container {
-                padding: 15px;
-            }
-            h2 {
-                font-size: 22px;
-            }
-            select, textarea, button {
-                font-size: 14px;
-            }
+            .container { padding: 15px; }
+            .tabs { flex-direction: column; }
+            .tab-btn { width: 100%; }
         }
     </style>
 </head>
@@ -240,7 +107,7 @@ $repairs = $repairsStmt->fetchAll(PDO::FETCH_ASSOC);
             <?php
             $errorMessages = [
                 'missing_fields' => '❌ يرجى تعبئة جميع الحقول المطلوبة.',
-                'not_eligible' => '❌ هذا المنتج غير مؤهل للصيانة (الطلب لم يُسلّم بعد).',
+                'not_eligible' => '❌ هذا المنتج غير مؤهل للصيانة تحت الضمان.',
                 'database' => '❌ حدث خطأ أثناء إرسال الطلب. يرجى المحاولة لاحقاً.',
                 'invalid_request' => '❌ طلب غير صالح.',
                 'unauthorized' => '❌ غير مسموح لك بحذف هذا الطلب.',
@@ -253,38 +120,81 @@ $repairs = $repairsStmt->fetchAll(PDO::FETCH_ASSOC);
 
         <h2>🔧 طلب صيانة</h2>
 
-        <?php if (!empty($deliveredItems)): ?>
+        <!-- ✅ Tabs for Internal vs External Repair -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('internal')">📦 منتجات من الموقع</button>
+            <button class="tab-btn" onclick="showTab('external')">🛍️ منتجات من المتجر (خارج الموقع)</button>
+        </div>
+
+        <!-- ✅ Internal Repair Form (Products bought from site) -->
+        <div id="internal" class="form-section active">
+            <?php if (!empty($deliveredItems)): ?>
+                <div class="card">
+                    <form action="submit_repair.php" method="POST">
+                        <input type="hidden" name="repair_type" value="internal">
+                        
+                        <label for="product_id">اختر المنتج:</label>
+                        <select name="product_id" id="product_id" required>
+                            <option value="">-- اختر منتجًا --</option>
+                            <?php foreach ($deliveredItems as $item): 
+                                $isUnderWarranty = $item['warranty_expiry'] && strtotime($item['warranty_expiry']) >= time();
+                            ?>
+                                <option value="<?= $item['product_id'] ?>" 
+                                        data-warranty="<?= $item['warranty_expiry'] ?>"
+                                        data-duration="<?= htmlspecialchars($item['warranty_duration']) ?>">
+                                    <?= htmlspecialchars($item['product_name']) ?>
+                                    <?php if ($item['warranty_expiry']): ?>
+                                        - <span class="warranty-badge <?= $isUnderWarranty ? 'warranty-active' : 'warranty-expired' ?>">
+                                            <?= $isUnderWarranty ? 'ضمن الضمان' : 'انتهى الضمان' ?>
+                                        </span>
+                                        (<?= htmlspecialchars($item['warranty_duration']) ?>)
+                                    <?php else: ?>
+                                        - <span class="warranty-badge warranty-none">بدون ضمان</span>
+                                    <?php endif; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+
+                        <label for="description">وصف المشكلة:</label>
+                        <textarea name="description" id="description" placeholder="اذكر تفاصيل العطل..." required></textarea>
+
+                        <button type="submit">📤 إرسال طلب الصيانة</button>
+                    </form>
+                </div>
+            <?php else: ?>
+                <div class="empty-message">ليس لديك منتجات مُسلّمة من الموقع حتى الآن.</div>
+            <?php endif; ?>
+        </div>
+
+        <!-- ✅ External Repair Form (Walk-in / Shop purchases) -->
+        <div id="external" class="form-section">
             <div class="card">
                 <form action="submit_repair.php" method="POST">
-                    <label for="product_id">اختر المنتج الذي تريد صيانته:</label>
-                    <select name="product_id" id="product_id" required>
-                        <option value="">-- اختر منتجًا --</option>
-                        <?php foreach ($deliveredItems as $item): 
-                            $hasWarranty = $item['warranty_expiry'] && strtotime($item['warranty_expiry']) >= time();
-                        ?>
-                            <option value="<?= $item['product_id'] ?>">
-                                <?= htmlspecialchars($item['product_name']) ?>
-                                <?php if ($item['warranty_expiry']): ?>
-                                    (<?= $hasWarranty ? 'ضمن الضمان حتى: ' . htmlspecialchars($item['warranty_expiry']) : 'انتهى الضمان: ' . htmlspecialchars($item['warranty_expiry']) ?>)
-                                <?php else: ?>
-                                    (بدون ضمان)
-                                <?php endif; ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <input type="hidden" name="repair_type" value="external">
+                    
+                    <label for="external_item">اسم الجهاز / المنتج:</label>
+                    <input type="text" name="external_item" id="external_item" placeholder="مثال: آيفون 13 برو" required>
 
-                    <label for="description">وصف المشكلة:</label>
-                    <textarea name="description" id="description" placeholder="اذكر تفاصيل العطل..." required></textarea>
+                    <label for="external_phone">رقم الهاتف:</label>
+                    <input type="tel" name="external_phone" id="external_phone" placeholder="05XXXXXXXX" value="<?= htmlspecialchars($_SESSION['phone'] ?? '') ?>" required>
+
+                    <label for="external_description">وصف المشكلة:</label>
+                    <textarea name="external_description" id="external_description" placeholder="اذكر تفاصيل العطل..." required></textarea>
+
+                    <label>
+                        <input type="checkbox" name="damage_from_factory" value="1">
+                        العطل من المصنع (ليس بسبب الاستخدام)
+                    </label>
 
                     <button type="submit">📤 إرسال طلب الصيانة</button>
                 </form>
             </div>
-        <?php else: ?>
-            <div class="empty-message">
-                ليس لديك منتجات مُسلّمة حتى الآن.
-            </div>
-        <?php endif; ?>
+            <p style="text-align:center; color:#666; font-size:14px; margin-top:10px;">
+                ⚠️ المنتجات التي لم تُشترَ من الموقع لا تشملها سياسة الضمان، وسيتم تقييمها بشكل منفصل.
+            </p>
+        </div>
 
+        <!-- ✅ Past Repairs List -->
         <h3>📜 طلبات الصيانة السابقة</h3>
         <?php if (empty($repairs)): ?>
             <div class="empty-message">لم تقم بأي طلبات صيانة بعد.</div>
@@ -292,7 +202,7 @@ $repairs = $repairsStmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="card">
                 <?php foreach ($repairs as $r): ?>
                     <div class="repair-item">
-                        <p><strong>📦 المنتج:</strong> <?= htmlspecialchars($r['product_name'] ?? 'غير معروف') ?></p>
+                        <p><strong>📦 المنتج:</strong> <?= htmlspecialchars($r['product_name'] ?? ($r['is_external_item'] ? 'منتج خارجي' : 'غير معروف')) ?></p>
                         <p><strong>📝 الوصف:</strong> <?= htmlspecialchars($r['description']) ?></p>
                         <p><strong>🔄 الحالة:</strong> 
                             <span class="status-badge">
@@ -308,35 +218,43 @@ $repairs = $repairsStmt->fetchAll(PDO::FETCH_ASSOC);
                                 ?>
                             </span>
                         </p>
-                        <p><strong>🛡️ نوع الطلب:</strong> 
-                            <?= $r['is_warranty_claim'] ? 'ضمن الضمان' : 'خارج الضمان' ?>
+                        <p><strong>🛡️ النوع:</strong> 
+                            <?php if ($r['is_external_item']): ?>
+                                <span style="color:#856404;">🛍️ منتج خارجي (بدون ضمان)</span>
+                            <?php else: ?>
+                                <?= $r['is_warranty_claim'] ? '✅ ضمن الضمان' : '❌ خارج الضمان' ?>
+                            <?php endif; ?>
                         </p>
-                        <p><strong>📅 تاريخ الطلب:</strong> <?= date('Y-m-d', strtotime($r['created_at'])) ?></p>
+                        <p><strong>📅 التاريخ:</strong> <?= date('Y-m-d', strtotime($r['created_at'])) ?></p>
                         
-                        <!-- ✅ Delete Button (only show for pending/cancelled requests) -->
                         <?php if ($r['status'] === 'pending' || $r['status'] === 'cancelled'): ?>
                             <form action="delete_repair.php" method="POST" style="display:inline;" 
-                                  onsubmit="return confirm('⚠️ هل أنت متأكد من حذف طلب الصيانة هذا؟\n\nلا يمكن التراجع عن هذا الإجراء.');">
+                                  onsubmit="return confirm('⚠️ هل أنت متأكد من حذف هذا الطلب؟');">
                                 <input type="hidden" name="repair_id" value="<?= $r['id'] ?>">
-                                <button type="submit" class="delete-btn">🗑️ حذف الطلب</button>
+                                <button type="submit" class="delete-btn">🗑️ حذف</button>
                             </form>
                         <?php else: ?>
-                            <p class="repair-note">🔒 لا يمكن حذف الطلبات المكتملة أو قيد التنفيذ</p>
+                            <span class="action-disabled">🔒 لا يمكن الحذف</span>
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
 
-        <!-- ✅ Navigation Buttons (Logout Removed) -->
         <div class="nav-links">
-            <a href="../index.php" class="nav-home">🏠 الصفحة الرئيسية</a>
-            <a href="../orders/orders.php" class="nav-orders">📦 عرض الطلبات</a>
+            <a href="../index.php">🏠 الرئيسية</a>
+            <a href="../orders/orders.php">📦 طلباتي</a>
         </div>
     </div>
 
     <script>
-        // Clean URL after showing success/error message
+        function showTab(tabName) {
+            document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        // Clean URL after message
         if (window.location.search.includes('success=1') || window.location.search.includes('deleted=1') || window.location.search.includes('error=')) {
             if (window.history.replaceState) {
                 window.history.replaceState(null, null, window.location.pathname);
