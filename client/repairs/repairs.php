@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 require_once '../../include/db_connect.php';
 $user_id = $_SESSION['user_id'];
 
-// ✅ Get delivered orders with warranty info
+// ✅ Get delivered orders with category warranty info
 $stmt = $pdo->prepare("
     SELECT 
         oi.id AS order_item_id,
@@ -16,9 +16,9 @@ $stmt = $pdo->prepare("
         p.id AS product_id,
         p.name_ar AS product_name,
         p.category_id,
-        o.warranty_expiry,
+        o.created_at AS order_date,
         c.warranty_duration,
-        o.created_at AS order_date
+        c.name_ar AS category_name
     FROM orders o
     JOIN order_items oi ON o.id = oi.order_id
     JOIN products p ON oi.product_id = p.id
@@ -29,6 +29,26 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$user_id]);
 $deliveredItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Calculate warranty expiry for each item
+foreach ($deliveredItems as &$item) {
+    $item['warranty_expiry'] = null;
+    $item['is_under_warranty'] = false;
+    
+    if ($item['warranty_duration']) {
+        // Extract months from warranty_duration (e.g., "9 اشهر" -> 9)
+        preg_match('/(\d+)/', $item['warranty_duration'], $matches);
+        if (isset($matches[1])) {
+            $months = (int)$matches[1];
+            $orderDate = new DateTime($item['order_date']);
+            $expiryDate = clone $orderDate;
+            $expiryDate->modify("+{$months} months");
+            $item['warranty_expiry'] = $expiryDate->format('Y-m-d');
+            $item['is_under_warranty'] = ($expiryDate >= new DateTime());
+        }
+    }
+}
+unset($item);
 
 // Past repair requests
 $repairsStmt = $pdo->prepare("
@@ -136,18 +156,18 @@ $repairs = $repairsStmt->fetchAll(PDO::FETCH_ASSOC);
                         <label for="product_id">اختر المنتج:</label>
                         <select name="product_id" id="product_id" required>
                             <option value="">-- اختر منتجًا --</option>
-                            <?php foreach ($deliveredItems as $item): 
-                                $isUnderWarranty = $item['warranty_expiry'] && strtotime($item['warranty_expiry']) >= time();
-                            ?>
+                            <?php foreach ($deliveredItems as $item): ?>
                                 <option value="<?= $item['product_id'] ?>" 
                                         data-warranty="<?= $item['warranty_expiry'] ?>"
-                                        data-duration="<?= htmlspecialchars($item['warranty_duration']) ?>">
+                                        data-duration="<?= htmlspecialchars($item['warranty_duration']) ?>"
+                                        data-under-warranty="<?= $item['is_under_warranty'] ? '1' : '0' ?>">
                                     <?= htmlspecialchars($item['product_name']) ?>
                                     <?php if ($item['warranty_expiry']): ?>
-                                        - <span class="warranty-badge <?= $isUnderWarranty ? 'warranty-active' : 'warranty-expired' ?>">
-                                            <?= $isUnderWarranty ? 'ضمن الضمان' : 'انتهى الضمان' ?>
+                                        - <span class="warranty-badge <?= $item['is_under_warranty'] ? 'warranty-active' : 'warranty-expired' ?>">
+                                            <?= $item['is_under_warranty'] ? 'ضمن الضمان' : 'انتهى الضمان' ?>
                                         </span>
                                         (<?= htmlspecialchars($item['warranty_duration']) ?>)
+                                        - ينتهي: <?= $item['warranty_expiry'] ?>
                                     <?php else: ?>
                                         - <span class="warranty-badge warranty-none">بدون ضمان</span>
                                     <?php endif; ?>
@@ -176,7 +196,7 @@ $repairs = $repairsStmt->fetchAll(PDO::FETCH_ASSOC);
                     <input type="text" name="external_item" id="external_item" placeholder="مثال: آيفون 13 برو" required>
 
                     <label for="external_phone">رقم الهاتف:</label>
-                    <input type="tel" name="external_phone" id="external_phone" placeholder="05XXXXXXXX" value="<?= htmlspecialchars($_SESSION['phone'] ?? '') ?>" required>
+                    <input type="tel" name="external_phone" id="external_phone" placeholder="05XXXXXXXX" required>
 
                     <label for="external_description">وصف المشكلة:</label>
                     <textarea name="external_description" id="external_description" placeholder="اذكر تفاصيل العطل..." required></textarea>

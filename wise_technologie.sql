@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 28, 2025 at 10:23 PM
+-- Generation Time: Apr 19, 2026 at 11:04 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,77 +24,98 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Table structure for table `cart_items`
 --
-CREATE TABLE `users` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `username` VARCHAR(255) NOT NULL,
-  `email` VARCHAR(255) NOT NULL,
-  `password_hash` VARCHAR(255) NOT NULL,
-  `First_name` VARCHAR(255) DEFAULT NULL,
-  `Last_name` VARCHAR(255) DEFAULT NULL,
-  `phone` VARCHAR(20) DEFAULT NULL,
-  `address` TEXT DEFAULT NULL,
-  `role` ENUM('customer','admin','technician') DEFAULT 'customer',
-  `token_expire` DATETIME DEFAULT NULL,
-  `reset_token` VARCHAR(255) DEFAULT NULL,
-  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `username` (`username`),
-  UNIQUE KEY `email` (`email`)
+
+CREATE TABLE `cart_items` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1,
+  `added_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Insert data into `users` table
--- admin password: admin
--- user password: user21
--- tech password: tech21
---
-
-INSERT INTO users (username, email, password_hash, First_name, Last_name, phone, address, role) VALUES
-('admin', 'admin@example.com', '$2y$10$YMeb0bSzfdc8NNZ.9t/F8.GjeLtCJFnX2Skyiu8CuGzO4oe0ddJ6a', 'Admin', 'Main', '0555000001', 'Admin Address', 'admin'),
-('user',  'user@example.com',  '$2y$10$UWPeAQXY03PoIoy0cEqSTOCr./CFwDMvsF1xcHbPj4zguJz3xQIw6',  'Normal', 'User', '0555000002', 'Customer Address', 'customer'),
-('tech',  'tech@example.com',  '$2y$10$EKG0hQB2fPr42TOLTb4mKuPf.Q8ynchnUnSn2GgAsH7XbRPTEKJC2',  'Tech',  'User', '0555000003', 'Technician Address', 'technician');
--- --------------------------------------------------------
-
---
 -- Table structure for table `categories`
 --
+
 CREATE TABLE `categories` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `name_ar` VARCHAR(255) NOT NULL,
-  `name_fr` VARCHAR(255) NOT NULL,
-  `name_en` VARCHAR(255) NOT NULL,
-  `warranty_duration` VARCHAR(50) DEFAULT NULL,
-  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  `id` int(11) NOT NULL,
+  `name_ar` varchar(255) NOT NULL,
+  `name_fr` varchar(255) NOT NULL,
+  `name_en` varchar(255) NOT NULL,
+  `warranty_duration` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `categories`
 --
 
-INSERT INTO `categories`
-(`id`, `name_ar`, `name_fr`, `name_en`, `created_at`, `warranty_duration`)
-VALUES
-(1, 'الهواتف', 'Téléphones', 'Phones', '2025-08-25 21:08:59', '9 اشهر'),
-(2, 'لابتوبات', 'Ordinateurs portables', 'Laptops', '2025-08-25 21:08:59', '12 شهر');
+INSERT INTO `categories` (`id`, `name_ar`, `name_fr`, `name_en`, `warranty_duration`, `created_at`) VALUES
+(1, 'الهواتف', 'Téléphones', 'Phones', '9 اشهر', '2025-08-25 21:08:59'),
+(2, 'لابتوبات', 'Ordinateurs portables', 'Laptops', '12 شهر', '2025-08-25 21:08:59');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `orders`
+--
+
+CREATE TABLE `orders` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `total_amount` decimal(10,2) NOT NULL,
+  `payment_method_id` int(11) DEFAULT NULL,
+  `shipping_address` text NOT NULL,
+  `phone` varchar(20) NOT NULL,
+  `status` enum('pending','processing','shipped','delivered','cancelled') DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `warranty_expiry` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`id`, `user_id`, `total_amount`, `payment_method_id`, `shipping_address`, `phone`, `status`, `created_at`, `warranty_expiry`) VALUES
+(1, 4, 20000.00, 1, 'sasa', '0793821123', 'delivered', '2026-04-19 08:45:27', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_items`
+--
+
+CREATE TABLE `order_items` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `unit_price` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `order_items`
+--
+
+INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `unit_price`) VALUES
+(1, 1, 1, 2, 10000.00);
 
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `payment_methods`
 --
+
 CREATE TABLE `payment_methods` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `method_name_ar` VARCHAR(100) NOT NULL,
-  `method_name_fr` VARCHAR(100) NOT NULL,
-  `method_name_en` VARCHAR(100) NOT NULL,
-  `icon_class` VARCHAR(50) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `id` int(11) NOT NULL,
+  `method_name_ar` varchar(100) NOT NULL,
+  `method_name_fr` varchar(100) NOT NULL,
+  `method_name_en` varchar(100) NOT NULL,
+  `icon_class` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -110,47 +131,80 @@ INSERT INTO `payment_methods` (`id`, `method_name_ar`, `method_name_fr`, `method
 --
 -- Table structure for table `products`
 --
+
 CREATE TABLE `products` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `name_ar` VARCHAR(255) NOT NULL,
-  `name_fr` VARCHAR(255) NOT NULL,
-  `name_en` VARCHAR(255) NOT NULL,
-  `description_ar` TEXT DEFAULT NULL,
-  `description_fr` TEXT DEFAULT NULL,
-  `description_en` TEXT DEFAULT NULL,
-  `price` DECIMAL(10,2) NOT NULL,
-  `image_url` VARCHAR(500) DEFAULT NULL,
-  `category_id` INT(11) NOT NULL,
-  `stock_quantity` INT(11) DEFAULT 0,
-  `is_active` TINYINT(1) DEFAULT 1,
-  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `category_id` (`category_id`),
-  CONSTRAINT `products_ibfk_1`
-    FOREIGN KEY (`category_id`)
-    REFERENCES `categories` (`id`)
-    ON DELETE CASCADE
+  `id` int(11) NOT NULL,
+  `name_ar` varchar(255) NOT NULL,
+  `name_fr` varchar(255) NOT NULL,
+  `name_en` varchar(255) NOT NULL,
+  `description_ar` text DEFAULT NULL,
+  `description_fr` text DEFAULT NULL,
+  `description_en` text DEFAULT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `image_url` varchar(500) DEFAULT NULL,
+  `category_id` int(11) NOT NULL,
+  `stock_quantity` int(11) DEFAULT 0,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `products`
+--
+
+INSERT INTO `products` (`id`, `name_ar`, `name_fr`, `name_en`, `description_ar`, `description_fr`, `description_en`, `price`, `image_url`, `category_id`, `stock_quantity`, `is_active`, `created_at`) VALUES
+(1, 'nokia', '', 'nokia', 'dadadda', NULL, 'adadada', 10000.00, '69e495c9a6492.jpg', 1, 97, 1, '2026-04-19 08:43:53');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `repairs`
+--
+
+CREATE TABLE `repairs` (
+  `id` int(11) NOT NULL,
+  `customer_name` varchar(255) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `item` enum('phone','laptop','tablet','other') DEFAULT 'other',
+  `description` text DEFAULT NULL,
+  `status` enum('pending','in_progress','completed','unrepairable','cancelled') DEFAULT 'pending',
+  `technician` varchar(255) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `is_warranty_claim` tinyint(1) DEFAULT 0,
+  `is_external_item` tinyint(1) DEFAULT 0,
+  `damage_from_factory` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `repairs`
+--
+
+INSERT INTO `repairs` (`id`, `customer_name`, `phone`, `item`, `description`, `status`, `technician`, `user_id`, `product_id`, `is_warranty_claim`, `is_external_item`, `damage_from_factory`, `created_at`, `updated_at`) VALUES
+(1, 'djb djb', '0793821123', 'other', 'fzd', 'pending', NULL, 5, NULL, 0, 1, 1, '2026-04-19 08:42:31', '2026-04-19 08:42:31'),
+(3, 'djbaer reahmane', '0793821123', 'other', 'shl9', 'pending', NULL, 4, 1, 0, 0, 0, '2026-04-19 08:58:08', '2026-04-19 08:58:08');
 
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `services`
 --
+
 CREATE TABLE `services` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `name_ar` VARCHAR(150) NOT NULL,
-  `name_fr` VARCHAR(150) NOT NULL,
-  `name_en` VARCHAR(150) NOT NULL,
-  `description_ar` TEXT DEFAULT NULL,
-  `description_fr` TEXT DEFAULT NULL,
-  `description_en` TEXT DEFAULT NULL,
-  `price` DECIMAL(10,2) NOT NULL,
-  `estimated_time` VARCHAR(50) DEFAULT NULL,
-  `status` ENUM('active','inactive') DEFAULT 'active',
-  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  `id` int(11) NOT NULL,
+  `name_ar` varchar(150) NOT NULL,
+  `name_fr` varchar(150) NOT NULL,
+  `name_en` varchar(150) NOT NULL,
+  `description_ar` text DEFAULT NULL,
+  `description_fr` text DEFAULT NULL,
+  `description_en` text DEFAULT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `estimated_time` varchar(50) DEFAULT NULL,
+  `status` enum('active','inactive') DEFAULT 'active',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -164,125 +218,234 @@ INSERT INTO `services` (`id`, `name_ar`, `name_fr`, `name_en`, `description_ar`,
 -- --------------------------------------------------------
 
 --
--- Table structure for table `orders`
+-- Table structure for table `users`
 --
-CREATE TABLE `orders` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `user_id` INT(11) NOT NULL,
-  `total_amount` DECIMAL(10,2) NOT NULL,
-  `payment_method_id` INT(11) DEFAULT NULL,
-  `shipping_address` TEXT NOT NULL,
-  `phone` VARCHAR(20) NOT NULL,
-  `status` ENUM('pending','processing','shipped','delivered','cancelled') DEFAULT 'pending',
-  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `warranty_expiry` DATE DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `payment_method_id` (`payment_method_id`),
-  CONSTRAINT `orders_ibfk_1`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `users` (`id`)
-    ON DELETE CASCADE,
-  CONSTRAINT `orders_ibfk_2`
-    FOREIGN KEY (`payment_method_id`)
-    REFERENCES `payment_methods` (`id`)
-    ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `order_items`
---
-CREATE TABLE `order_items` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `order_id` INT(11) NOT NULL,
-  `product_id` INT(11) NOT NULL,
-  `quantity` INT(11) NOT NULL,
-  `unit_price` DECIMAL(10,2) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `order_id` (`order_id`),
-  KEY `product_id` (`product_id`),
-  CONSTRAINT `order_items_ibfk_1`
-    FOREIGN KEY (`order_id`)
-    REFERENCES `orders` (`id`)
-    ON DELETE CASCADE,
-  CONSTRAINT `order_items_ibfk_2`
-    FOREIGN KEY (`product_id`)
-    REFERENCES `products` (`id`)
-    ON DELETE CASCADE
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `First_name` varchar(255) DEFAULT NULL,
+  `Last_name` varchar(255) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `role` enum('customer','admin','technician') DEFAULT 'customer',
+  `token_expire` datetime DEFAULT NULL,
+  `reset_token` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Table structure for table `cart_items`
---
-CREATE TABLE `cart_items` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `user_id` INT(11) NOT NULL,
-  `product_id` INT(11) NOT NULL,
-  `quantity` INT(11) NOT NULL DEFAULT 1,
-  `added_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_user_product` (`user_id`,`product_id`),
-  KEY `product_id` (`product_id`),
-  CONSTRAINT `cart_items_ibfk_1`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `users` (`id`)
-    ON DELETE CASCADE,
-  CONSTRAINT `cart_items_ibfk_2`
-    FOREIGN KEY (`product_id`)
-    REFERENCES `products` (`id`)
-    ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `repair_orders`
+-- Dumping data for table `users`
 --
 
-CREATE TABLE `repairs` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `customer_name` VARCHAR(255) NOT NULL,
-  `phone` VARCHAR(20) DEFAULT NULL,
-  `item` ENUM('phone','laptop','tablet','other') NOT NULL,
-  `description` TEXT DEFAULT NULL,
-  `status` ENUM('pending','in_progress','completed','unrepairable','cancelled') DEFAULT 'pending',
-  `technician` VARCHAR(255) DEFAULT NULL,
-  `user_id` INT(11) DEFAULT NULL,
-  `product_id` INT(11) DEFAULT NULL,
-  `is_warranty_claim` TINYINT(1) DEFAULT 0,
-  `damage_from_factory` TINYINT(1) DEFAULT 0,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `product_id` (`product_id`),
-  CONSTRAINT `repairs_ibfk_1`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `users` (`id`)
-    ON DELETE SET NULL,
-  CONSTRAINT `repairs_ibfk_2`
-    FOREIGN KEY (`product_id`)
-    REFERENCES `products` (`id`)
-    ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `First_name`, `Last_name`, `phone`, `address`, `role`, `token_expire`, `reset_token`, `created_at`, `updated_at`) VALUES
+(1, 'admin', 'admin@example.com', '$2y$10$YMeb0bSzfdc8NNZ.9t/F8.GjeLtCJFnX2Skyiu8CuGzO4oe0ddJ6a', 'Admin', 'Main', '0555000001', 'Admin Address', 'admin', NULL, NULL, '2026-04-19 08:02:04', '2026-04-19 08:02:04'),
+(2, 'user', 'user@example.com', '$2y$10$UWPeAQXY03PoIoy0cEqSTOCr./CFwDMvsF1xcHbPj4zguJz3xQIw6', 'Normal', 'User', '0555000002', 'Customer Address', 'customer', NULL, NULL, '2026-04-19 08:02:04', '2026-04-19 08:02:04'),
+(3, 'tech', 'tech@example.com', '$2y$10$EKG0hQB2fPr42TOLTb4mKuPf.Q8ynchnUnSn2GgAsH7XbRPTEKJC2', 'Tech', 'User', '0555000003', 'Technician Address', 'technician', NULL, NULL, '2026-04-19 08:02:04', '2026-04-19 08:02:04'),
+(4, 'DJBDJOUB', 'abdou210crazyboy@gmail.com', '$2y$10$nwTFPhbTaXRxY.1N2fZ2euNKxOfusURhBJJKzRNgzER0SqyqXDFu.', 'djbaer', 'reahmane', '0793821123', NULL, 'customer', NULL, NULL, '2026-04-19 08:03:00', '2026-04-19 08:03:00'),
+(5, 'Djabertheonlyone', 'genhndb@gmail.com', '$2y$10$ctZ1013uq6hUAq.9MnYFX.G5guqYa2u8d3/qiRa4rBFyd1ytUZL2a', 'djb', 'djb', '0793821123', NULL, 'technician', NULL, NULL, '2026-04-19 08:41:26', '2026-04-19 08:41:26');
 
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `warranty_rules`
 --
+
 CREATE TABLE `warranty_rules` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `category_id` INT(11) NOT NULL,
-  `duration_months` INT(11) NOT NULL DEFAULT 12,
-  `description` TEXT DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `category_id` (`category_id`),
-  CONSTRAINT `warranty_rules_ibfk_1`
-    FOREIGN KEY (`category_id`)
-    REFERENCES `categories` (`id`)
-    ON DELETE CASCADE
+  `id` int(11) NOT NULL,
+  `category_id` int(11) NOT NULL,
+  `duration_months` int(11) NOT NULL DEFAULT 12,
+  `description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `cart_items`
+--
+ALTER TABLE `cart_items`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_user_product` (`user_id`,`product_id`),
+  ADD KEY `product_id` (`product_id`);
+
+--
+-- Indexes for table `categories`
+--
+ALTER TABLE `categories`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `payment_method_id` (`payment_method_id`);
+
+--
+-- Indexes for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `order_id` (`order_id`),
+  ADD KEY `product_id` (`product_id`);
+
+--
+-- Indexes for table `payment_methods`
+--
+ALTER TABLE `payment_methods`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `products`
+--
+ALTER TABLE `products`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `category_id` (`category_id`);
+
+--
+-- Indexes for table `repairs`
+--
+ALTER TABLE `repairs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `product_id` (`product_id`);
+
+--
+-- Indexes for table `services`
+--
+ALTER TABLE `services`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `warranty_rules`
+--
+ALTER TABLE `warranty_rules`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `category_id` (`category_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `cart_items`
+--
+ALTER TABLE `cart_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `categories`
+--
+ALTER TABLE `categories`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `order_items`
+--
+ALTER TABLE `order_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `payment_methods`
+--
+ALTER TABLE `payment_methods`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `products`
+--
+ALTER TABLE `products`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `repairs`
+--
+ALTER TABLE `repairs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `services`
+--
+ALTER TABLE `services`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `warranty_rules`
+--
+ALTER TABLE `warranty_rules`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `cart_items`
+--
+ALTER TABLE `cart_items`
+  ADD CONSTRAINT `cart_items_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `cart_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `orders`
+--
+ALTER TABLE `orders`
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`payment_method_id`) REFERENCES `payment_methods` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `products`
+--
+ALTER TABLE `products`
+  ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `repairs`
+--
+ALTER TABLE `repairs`
+  ADD CONSTRAINT `repairs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `repairs_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `warranty_rules`
+--
+ALTER TABLE `warranty_rules`
+  ADD CONSTRAINT `warranty_rules_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
