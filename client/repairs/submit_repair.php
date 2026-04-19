@@ -15,7 +15,7 @@ $repair_type = $_POST['repair_type'] ?? 'internal';
 
 require_once '../../include/db_connect.php';
 
-// ✅ Get user info from database
+// ✅ Get user info
 $userStmt = $pdo->prepare("SELECT First_name, Last_name, phone FROM users WHERE id = ?");
 $userStmt->execute([$user_id]);
 $user = $userStmt->fetch(PDO::FETCH_ASSOC);
@@ -23,7 +23,7 @@ $customer_name = trim(($user['First_name'] ?? '') . ' ' . ($user['Last_name'] ??
 $user_phone = $user['phone'] ?? '';
 
 // ========================
-// ✅ EXTERNAL REPAIR (Items not from site)
+// ✅ EXTERNAL REPAIR
 // ========================
 if ($repair_type === 'external') {
     $external_item = trim($_POST['external_item'] ?? '');
@@ -58,7 +58,7 @@ if ($repair_type === 'external') {
 }
 
 // ========================
-// ✅ INTERNAL REPAIR (Products from site)
+// ✅ INTERNAL REPAIR (Dynamic Warranty Calculation)
 // ========================
 $product_id = $_POST['product_id'] ?? null;
 $description = trim($_POST['description'] ?? '');
@@ -68,11 +68,12 @@ if (!$product_id || !$description) {
     exit();
 }
 
-// Verify user owns the product and order is delivered
+// 🔍 Get product, order, and category info
 $check = $pdo->prepare("
     SELECT 
-        o.warranty_expiry,
-        c.warranty_duration
+        o.created_at AS order_date,
+        c.warranty_duration,
+        p.name_ar AS product_name
     FROM orders o
     JOIN order_items oi ON o.id = oi.order_id
     JOIN products p ON oi.product_id = p.id
@@ -89,13 +90,28 @@ if (!$order) {
     exit();
 }
 
-// Check if under warranty
+// 🛡️ Calculate warranty expiry dynamically
 $isWarrantyClaim = 0;
-if ($order['warranty_expiry'] && strtotime($order['warranty_expiry']) >= time()) {
-    $isWarrantyClaim = 1;
+$warranty_expiry = null;
+
+if ($order['warranty_duration']) {
+    // Extract months from warranty_duration (e.g., "9 اشهر" -> 9)
+    preg_match('/(\d+)/', $order['warranty_duration'], $matches);
+    if (isset($matches[1])) {
+        $months = (int)$matches[1];
+        $orderDate = new DateTime($order['order_date']);
+        $expiryDate = clone $orderDate;
+        $expiryDate->modify("+{$months} months");
+        $warranty_expiry = $expiryDate;
+        
+        // Check if still under warranty
+        if ($expiryDate >= new DateTime()) {
+            $isWarrantyClaim = 1;
+        }
+    }
 }
 
-// ✅ Insert repair with customer_name and phone
+// Insert repair request
 $insert = $pdo->prepare("
     INSERT INTO repairs (
         user_id, 
@@ -113,8 +129,8 @@ $insert = $pdo->prepare("
 $insert->execute([
     $user_id, 
     $product_id, 
-    $customer_name,  // ✅ Saves user's full name
-    $user_phone,     // ✅ Saves user's phone
+    $customer_name,
+    $user_phone,
     $description, 
     $isWarrantyClaim
 ]);
