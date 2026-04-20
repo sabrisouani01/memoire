@@ -1,12 +1,13 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
+    header("Location: ../../auth/login.php");
     exit();
 }
 
 require_once '../../include/db_connect.php';
 $user_id = $_SESSION['user_id'];
+$username = htmlspecialchars($_SESSION['username']);
 
 // ✅ Get delivered orders with category warranty info
 $stmt = $pdo->prepare("
@@ -36,7 +37,6 @@ foreach ($deliveredItems as &$item) {
     $item['is_under_warranty'] = false;
     
     if ($item['warranty_duration']) {
-        // Extract months from warranty_duration (e.g., "9 اشهر" -> 9)
         preg_match('/(\d+)/', $item['warranty_duration'], $matches);
         if (isset($matches[1])) {
             $months = (int)$matches[1];
@@ -67,219 +67,377 @@ $repairsStmt = $pdo->prepare("
 ");
 $repairsStmt->execute([$user_id]);
 $repairs = $repairsStmt->fetchAll(PDO::FETCH_ASSOC);
-?>
 
+// Stats
+$totalRepairs = count($repairs);
+$pendingRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'pending'));
+$completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'completed'));
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>طلبات الصيانة</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background: #f5f5f5; padding: 20px; direction: rtl; }
-        .container { max-width: 900px; margin: auto; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h2, h3 { color: #333; margin: 20px 0 15px; text-align: center; }
-        .card { background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
-        .tab-btn { padding: 10px 20px; border: 2px solid #0d6efd; background: #fff; color: #0d6efd; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .tab-btn.active, .tab-btn:hover { background: #0d6efd; color: #fff; }
-        .form-section { display: none; }
-        .form-section.active { display: block; }
-        label { display: block; margin: 12px 0 6px; font-weight: bold; color: #444; }
-        select, textarea, input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; direction: rtl; }
-        textarea { min-height: 80px; resize: vertical; }
-        button[type="submit"] { background: #0d6efd; color: #fff; border: none; padding: 12px 20px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-        button[type="submit"]:hover { background: #0b5ed7; }
-        .repair-item { padding: 15px 0; border-bottom: 1px dashed #eee; }
-        .repair-item:last-child { border-bottom: none; }
-        .repair-item p { margin: 5px 0; font-size: 14px; }
-        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; background: #e9ecef; color: #495057; }
-        .warranty-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-right: 8px; }
-        .warranty-active { background: #d4edda; color: #155724; }
-        .warranty-expired { background: #f8d7da; color: #721c24; }
-        .warranty-none { background: #fff3cd; color: #856404; }
-        .alert { padding: 12px; border-radius: 6px; margin-bottom: 15px; font-weight: 500; }
-        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .empty-message { text-align: center; color: #666; font-style: italic; padding: 20px; }
-        .nav-links { text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee; }
-        .nav-links a { display: inline-block; margin: 0 10px; text-decoration: none; color: #0d6efd; font-weight: bold; }
-        .delete-btn { background: #dc3545; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; margin-top: 8px; }
-        .delete-btn:hover { background: #c82333; }
-        .action-disabled { color: #999; font-size: 13px; font-style: italic; }
-        @media (max-width: 600px) {
-            .container { padding: 15px; }
-            .tabs { flex-direction: column; }
-            .tab-btn { width: 100%; }
-        }
-    </style>
+    <title>الصيانة - Wise Tech</title>
+    <link rel="stylesheet" href="../../assests/css/user.css">
+    <script src="https://kit.fontawesome.com/4060ace190.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <div class="container">
-        
-        <!-- ✅ Alert Messages -->
+
+<!-- ===== SHARED HEADER ===== -->
+<header class="top-header">
+    <div class="nav-container">
+        <div class="nav-icons">
+            <span class="menu" id="menu"><i class="fa-solid fa-bars"></i></span>
+            <div class="user-info" id="user-menu-trigger">
+                <i class="fa-solid fa-user"></i>
+                <span class="username"><?= $username ?></span>
+                <i class="fa-solid fa-chevron-down" style="font-size:11px;"></i>
+            </div>
+        </div>
+
+        <nav class="nav-links" id="nav-links">
+            <a href="../index.php">الرئيسية</a>
+            <a href="../orders/orders.php">طلباتي</a>
+            <a href="repairs.php" class="active">الصيانة</a>
+        </nav>
+
+        <a href="../index.php" class="logo">
+            <span class="logo-text">Wise<span>Tech</span></span>
+        </a>
+    </div>
+
+    <!-- USER DROPDOWN -->
+    <div class="dropdown-menu" id="user-dropdown">
+        <a href="../index.php"><i class="fa-solid fa-house"></i> الرئيسية</a>
+        <a href="../orders/orders.php"><i class="fa-solid fa-box"></i> طلباتي</a>
+        <a href="../../auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</a>
+    </div>
+</header>
+
+<!-- ===== LAYOUT ===== -->
+<div class="page-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="sidebar-logo-text">Wise<span>Tech</span></span>
+        </div>
+
+        <p class="sidebar-section-label">التنقل</p>
+        <ul class="sidebar-nav">
+            <li><a href="../index.php"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
+            <li><a href="../orders/orders.php"><i class="fa-solid fa-box"></i> طلباتي</a></li>
+            <li><a href="repairs.php" class="active"><i class="fa-solid fa-screwdriver-wrench"></i> طلبات الصيانة</a></li>
+        </ul>
+
+        <hr class="sidebar-divider">
+
+        <p class="sidebar-section-label">طلب صيانة</p>
+        <ul class="sidebar-nav">
+            <li><a href="#new-repair-section"><i class="fa-solid fa-plus-circle"></i> طلب جديد</a></li>
+            <li><a href="#history-section"><i class="fa-solid fa-history"></i> السجل</a></li>
+        </ul>
+
+        <hr class="sidebar-divider">
+
+        <p class="sidebar-section-label">الحساب</p>
+        <ul class="sidebar-nav">
+            <li><a href="../../auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</a></li>
+        </ul>
+    </aside>
+
+    <!-- OVERLAY -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="../index.php">الرئيسية</a>
+            <span>/</span>
+            <span>الصيانة</span>
+        </div>
+
+        <div class="page-header">
+            <h1><i class="fa-solid fa-screwdriver-wrench" style="color:var(--primary);margin-left:8px;font-size:24px;"></i> طلبات الصيانة</h1>
+            <p>قدّم طلب صيانة لمنتجاتك أو تابع طلباتك السابقة</p>
+        </div>
+
+        <!-- Alert Messages -->
         <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
-            <div class="alert alert-success">✅ تم إرسال طلب الصيانة بنجاح! سيتم مراجعته قريباً.</div>
+            <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> تم إرسال طلب الصيانة بنجاح! سيتم مراجعته قريباً.</div>
         <?php elseif (isset($_GET['deleted']) && $_GET['deleted'] == 1): ?>
-            <div class="alert alert-success">✅ تم حذف طلب الصيانة بنجاح.</div>
+            <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> تم حذف طلب الصيانة بنجاح.</div>
         <?php elseif (isset($_GET['error'])): ?>
             <?php
             $errorMessages = [
-                'missing_fields' => '❌ يرجى تعبئة جميع الحقول المطلوبة.',
-                'not_eligible' => '❌ هذا المنتج غير مؤهل للصيانة تحت الضمان.',
-                'database' => '❌ حدث خطأ أثناء إرسال الطلب. يرجى المحاولة لاحقاً.',
-                'invalid_request' => '❌ طلب غير صالح.',
-                'unauthorized' => '❌ غير مسموح لك بحذف هذا الطلب.',
-                'delete_failed' => '❌ فشل حذف الطلب. يرجى المحاولة لاحقاً.'
+                'missing_fields' => 'يرجى تعبئة جميع الحقول المطلوبة.',
+                'not_eligible'   => 'هذا المنتج غير مؤهل للصيانة تحت الضمان.',
+                'database'       => 'حدث خطأ أثناء إرسال الطلب. يرجى المحاولة لاحقاً.',
+                'invalid_request'=> 'طلب غير صالح.',
+                'unauthorized'   => 'غير مسموح لك بحذف هذا الطلب.',
+                'delete_failed'  => 'فشل حذف الطلب. يرجى المحاولة لاحقاً.'
             ];
-            $errorMsg = $errorMessages[$_GET['error']] ?? '❌ حدث خطأ غير معروف.';
+            $errorMsg = $errorMessages[$_GET['error']] ?? 'حدث خطأ غير معروف.';
             ?>
-            <div class="alert alert-error"><?= htmlspecialchars($errorMsg) ?></div>
+            <div class="alert alert-error"><i class="fa-solid fa-circle-xmark"></i> <?= htmlspecialchars($errorMsg) ?></div>
         <?php endif; ?>
 
-        <h2>🔧 طلب صيانة</h2>
-
-        <!-- ✅ Tabs for Internal vs External Repair -->
-        <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('internal')">📦 منتجات من الموقع</button>
-            <button class="tab-btn" onclick="showTab('external')">🛍️ منتجات من المتجر (خارج الموقع)</button>
+        <!-- Stats Strip -->
+        <div class="stats-strip">
+            <div class="stat-card">
+                <div class="stat-value"><?= $totalRepairs ?></div>
+                <div class="stat-label">إجمالي الطلبات</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color:var(--accent);"><?= $pendingRepairs ?></div>
+                <div class="stat-label">قيد الانتظار</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color:var(--success);"><?= $completedRepairs ?></div>
+                <div class="stat-label">مكتملة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color:var(--primary);"><?= count($deliveredItems) ?></div>
+                <div class="stat-label">منتجات مُسلَّمة</div>
+            </div>
         </div>
 
-        <!-- ✅ Internal Repair Form (Products bought from site) -->
-        <div id="internal" class="form-section active">
-            <?php if (!empty($deliveredItems)): ?>
-                <div class="card">
-                    <form action="submit_repair.php" method="POST">
-                        <input type="hidden" name="repair_type" value="internal">
-                        
-                        <label for="product_id">اختر المنتج:</label>
-                        <select name="product_id" id="product_id" required>
-                            <option value="">-- اختر منتجًا --</option>
-                            <?php foreach ($deliveredItems as $item): ?>
-                                <option value="<?= $item['product_id'] ?>" 
-                                        data-warranty="<?= $item['warranty_expiry'] ?>"
-                                        data-duration="<?= htmlspecialchars($item['warranty_duration']) ?>"
-                                        data-under-warranty="<?= $item['is_under_warranty'] ? '1' : '0' ?>">
-                                    <?= htmlspecialchars($item['product_name']) ?>
-                                    <?php if ($item['warranty_expiry']): ?>
-                                        - <span class="warranty-badge <?= $item['is_under_warranty'] ? 'warranty-active' : 'warranty-expired' ?>">
-                                            <?= $item['is_under_warranty'] ? 'ضمن الضمان' : 'انتهى الضمان' ?>
-                                        </span>
-                                        (<?= htmlspecialchars($item['warranty_duration']) ?>)
-                                        - ينتهي: <?= $item['warranty_expiry'] ?>
-                                    <?php else: ?>
-                                        - <span class="warranty-badge warranty-none">بدون ضمان</span>
-                                    <?php endif; ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+        <!-- ===== NEW REPAIR FORM ===== -->
+        <div id="new-repair-section">
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-plus-circle"></i> تقديم طلب صيانة جديد</div>
 
-                        <label for="description">وصف المشكلة:</label>
-                        <textarea name="description" id="description" placeholder="اذكر تفاصيل العطل..." required></textarea>
-
-                        <button type="submit">📤 إرسال طلب الصيانة</button>
-                    </form>
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="showTab('internal', this)">
+                        <i class="fa-solid fa-box"></i> منتجات من الموقع
+                    </button>
+                    <button class="tab-btn" onclick="showTab('external', this)">
+                        <i class="fa-solid fa-store"></i> منتجات من المتجر
+                    </button>
                 </div>
-            <?php else: ?>
-                <div class="empty-message">ليس لديك منتجات مُسلّمة من الموقع حتى الآن.</div>
-            <?php endif; ?>
-        </div>
 
-        <!-- ✅ External Repair Form (Walk-in / Shop purchases) -->
-        <div id="external" class="form-section">
-            <div class="card">
-                <form action="submit_repair.php" method="POST">
-                    <input type="hidden" name="repair_type" value="external">
-                    
-                    <label for="external_item">اسم الجهاز / المنتج:</label>
-                    <input type="text" name="external_item" id="external_item" placeholder="مثال: آيفون 13 برو" required>
+                <!-- INTERNAL FORM -->
+                <div id="internal" class="form-section active">
+                    <?php if (!empty($deliveredItems)): ?>
+                        <form action="submit_repair.php" method="POST">
+                            <input type="hidden" name="repair_type" value="internal">
 
-                    <label for="external_phone">رقم الهاتف:</label>
-                    <input type="tel" name="external_phone" id="external_phone" placeholder="05XXXXXXXX" required>
+                            <div class="form-group">
+                                <label for="product_id"><i class="fa-solid fa-mobile-screen" style="color:var(--primary);margin-left:6px;"></i> اختر المنتج:</label>
+                                <select name="product_id" id="product_id" required>
+                                    <option value="">-- اختر منتجًا --</option>
+                                    <?php foreach ($deliveredItems as $item): ?>
+                                        <option value="<?= $item['product_id'] ?>"
+                                                data-warranty="<?= $item['warranty_expiry'] ?>"
+                                                data-duration="<?= htmlspecialchars($item['warranty_duration']) ?>"
+                                                data-under-warranty="<?= $item['is_under_warranty'] ? '1' : '0' ?>">
+                                            <?= htmlspecialchars($item['product_name']) ?>
+                                            <?php if ($item['warranty_expiry']): ?>
+                                                — <?= $item['is_under_warranty'] ? 'ضمن الضمان' : 'انتهى الضمان' ?>
+                                                (<?= htmlspecialchars($item['warranty_duration']) ?>)
+                                                — ينتهي: <?= $item['warranty_expiry'] ?>
+                                            <?php else: ?>
+                                                — بدون ضمان
+                                            <?php endif; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
 
-                    <label for="external_description">وصف المشكلة:</label>
-                    <textarea name="external_description" id="external_description" placeholder="اذكر تفاصيل العطل..." required></textarea>
+                            <div class="form-group">
+                                <label for="description"><i class="fa-solid fa-comment-dots" style="color:var(--primary);margin-left:6px;"></i> وصف المشكلة:</label>
+                                <textarea name="description" id="description" placeholder="اذكر تفاصيل العطل بوضوح..." required></textarea>
+                            </div>
 
-                    <label>
-                        <input type="checkbox" name="damage_from_factory" value="1">
-                        العطل من المصنع (ليس بسبب الاستخدام)
-                    </label>
+                            <button type="submit" class="btn-submit">
+                                <i class="fa-solid fa-paper-plane"></i> إرسال طلب الصيانة
+                            </button>
+                        </form>
+                    <?php else: ?>
+                        <div class="empty-state">
+                            <i class="fa-solid fa-box-open"></i>
+                            <h3>لا توجد منتجات مُسلَّمة</h3>
+                            <p>ليس لديك منتجات مُسلّمة من الموقع حتى الآن.</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
 
-                    <button type="submit">📤 إرسال طلب الصيانة</button>
-                </form>
+                <!-- EXTERNAL FORM -->
+                <div id="external" class="form-section">
+                    <form action="submit_repair.php" method="POST">
+                        <input type="hidden" name="repair_type" value="external">
+
+                        <div class="form-group">
+                            <label for="external_item"><i class="fa-solid fa-mobile-screen-button" style="color:var(--primary);margin-left:6px;"></i> اسم الجهاز / المنتج:</label>
+                            <input type="text" name="external_item" id="external_item" placeholder="مثال: آيفون 13 برو" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="external_phone"><i class="fa-solid fa-phone" style="color:var(--primary);margin-left:6px;"></i> رقم الهاتف:</label>
+                            <input type="tel" name="external_phone" id="external_phone" placeholder="05XXXXXXXX" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="external_description"><i class="fa-solid fa-comment-dots" style="color:var(--primary);margin-left:6px;"></i> وصف المشكلة:</label>
+                            <textarea name="external_description" id="external_description" placeholder="اذكر تفاصيل العطل بوضوح..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="damage_from_factory" value="1">
+                                العطل من المصنع (ليس بسبب الاستخدام)
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <i class="fa-solid fa-paper-plane"></i> إرسال طلب الصيانة
+                        </button>
+                    </form>
+
+                    <p style="text-align:center; color:var(--gray-3); font-size:13px; margin-top:14px;">
+                        <i class="fa-solid fa-triangle-exclamation" style="color:var(--accent);"></i>
+                        المنتجات التي لم تُشترَ من الموقع لا تشملها سياسة الضمان، وسيتم تقييمها بشكل منفصل.
+                    </p>
+                </div>
             </div>
-            <p style="text-align:center; color:#666; font-size:14px; margin-top:10px;">
-                ⚠️ المنتجات التي لم تُشترَ من الموقع لا تشملها سياسة الضمان، وسيتم تقييمها بشكل منفصل.
-            </p>
         </div>
 
-        <!-- ✅ Past Repairs List -->
-        <h3>📜 طلبات الصيانة السابقة</h3>
-        <?php if (empty($repairs)): ?>
-            <div class="empty-message">لم تقم بأي طلبات صيانة بعد.</div>
-        <?php else: ?>
+        <!-- ===== PAST REPAIRS ===== -->
+        <div id="history-section">
             <div class="card">
-                <?php foreach ($repairs as $r): ?>
-                    <div class="repair-item">
-                        <p><strong>📦 المنتج:</strong> <?= htmlspecialchars($r['product_name'] ?? ($r['is_external_item'] ? 'منتج خارجي' : 'غير معروف')) ?></p>
-                        <p><strong>📝 الوصف:</strong> <?= htmlspecialchars($r['description']) ?></p>
-                        <p><strong>🔄 الحالة:</strong> 
-                            <span class="status-badge">
-                                <?php
-                                $status_labels = [
-                                    'pending' => 'قيد الانتظار',
-                                    'in_progress' => 'قيد التنفيذ',
-                                    'completed' => 'مكتمل',
-                                    'unrepairable' => 'لا يمكن إصلاحه',
-                                    'cancelled' => 'ملغى'
-                                ];
-                                echo $status_labels[$r['status']] ?? htmlspecialchars($r['status']);
-                                ?>
-                            </span>
-                        </p>
-                        <p><strong>🛡️ النوع:</strong> 
-                            <?php if ($r['is_external_item']): ?>
-                                <span style="color:#856404;">🛍️ منتج خارجي (بدون ضمان)</span>
-                            <?php else: ?>
-                                <?= $r['is_warranty_claim'] ? '✅ ضمن الضمان' : '❌ خارج الضمان' ?>
-                            <?php endif; ?>
-                        </p>
-                        <p><strong>📅 التاريخ:</strong> <?= date('Y-m-d', strtotime($r['created_at'])) ?></p>
-                        
-                        <?php if ($r['status'] === 'pending' || $r['status'] === 'cancelled'): ?>
-                            <form action="delete_repair.php" method="POST" style="display:inline;" 
-                                  onsubmit="return confirm('⚠️ هل أنت متأكد من حذف هذا الطلب؟');">
-                                <input type="hidden" name="repair_id" value="<?= $r['id'] ?>">
-                                <button type="submit" class="delete-btn">🗑️ حذف</button>
-                            </form>
-                        <?php else: ?>
-                            <span class="action-disabled">🔒 لا يمكن الحذف</span>
-                        <?php endif; ?>
+                <div class="card-title"><i class="fa-solid fa-history"></i> طلبات الصيانة السابقة</div>
+
+                <?php if (empty($repairs)): ?>
+                    <div class="empty-state">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                        <h3>لا توجد طلبات</h3>
+                        <p>لم تقم بأي طلبات صيانة بعد.</p>
                     </div>
-                <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="repairs-list">
+                        <?php foreach ($repairs as $r): ?>
+                            <?php
+                            $status_labels = [
+                                'pending'      => 'قيد الانتظار',
+                                'in_progress'  => 'قيد التنفيذ',
+                                'completed'    => 'مكتمل',
+                                'unrepairable' => 'لا يمكن إصلاحه',
+                                'cancelled'    => 'ملغى'
+                            ];
+                            ?>
+                            <div class="repair-item">
+                                <div class="repair-item-header">
+                                    <div class="repair-item-title">
+                                        <?= htmlspecialchars($r['product_name'] ?? ($r['is_external_item'] ? 'منتج خارجي' : 'غير معروف')) ?>
+                                    </div>
+                                    <span class="status-badge <?= htmlspecialchars($r['status']) ?>">
+                                        <?= $status_labels[$r['status']] ?? htmlspecialchars($r['status']) ?>
+                                    </span>
+                                </div>
+
+                                <div class="repair-item-meta">
+                                    <span>
+                                        <i class="fa-solid fa-calendar-days"></i>
+                                        <?= date('Y-m-d', strtotime($r['created_at'])) ?>
+                                    </span>
+                                    <span>
+                                        <?php if ($r['is_external_item']): ?>
+                                            <i class="fa-solid fa-store" style="color:var(--accent);"></i>
+                                            منتج خارجي (بدون ضمان)
+                                        <?php else: ?>
+                                            <?php if ($r['is_warranty_claim']): ?>
+                                                <i class="fa-solid fa-shield-check" style="color:var(--success);"></i>
+                                                ضمن الضمان
+                                            <?php else: ?>
+                                                <i class="fa-solid fa-shield-xmark" style="color:var(--danger);"></i>
+                                                خارج الضمان
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </span>
+                                    <span><i class="fa-solid fa-hashtag"></i> #<?= $r['id'] ?></span>
+                                </div>
+
+                                <div class="repair-item-desc">
+                                    <?= htmlspecialchars($r['description']) ?>
+                                </div>
+
+                                <div class="repair-item-actions">
+                                    <?php if ($r['status'] === 'pending' || $r['status'] === 'cancelled'): ?>
+                                        <form action="delete_repair.php" method="POST" style="display:inline;"
+                                              onsubmit="return confirm('هل أنت متأكد من حذف هذا الطلب؟');">
+                                            <input type="hidden" name="repair_id" value="<?= $r['id'] ?>">
+                                            <button type="submit" class="delete-btn">
+                                                <i class="fa-solid fa-trash"></i> حذف
+                                            </button>
+                                        </form>
+                                    <?php else: ?>
+                                        <span class="action-disabled">
+                                            <i class="fa-solid fa-lock"></i> لا يمكن الحذف
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
             </div>
-        <?php endif; ?>
-
-        <div class="nav-links">
-            <a href="../index.php">🏠 الرئيسية</a>
-            <a href="../orders/orders.php">📦 طلباتي</a>
         </div>
-    </div>
 
-    <script>
-        function showTab(tabName) {
-            document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
+    </main>
+</div>
+
+<!-- Sidebar Mobile Toggle Button -->
+<button class="sidebar-toggle" id="sidebar-toggle">
+    <i class="fa-solid fa-bars"></i>
+</button>
+
+<script>
+    // Tab switching
+    function showTab(tabName, btn) {
+        document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    // Clean URL after message
+    if (window.location.search) {
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.pathname);
         }
-        // Clean URL after message
-        if (window.location.search.includes('success=1') || window.location.search.includes('deleted=1') || window.location.search.includes('error=')) {
-            if (window.history.replaceState) {
-                window.history.replaceState(null, null, window.location.pathname);
-            }
-        }
-    </script>
+    }
+
+    // Sidebar
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebarMenuBtn = document.getElementById('sidebar-menu-btn');
+
+    function toggleSidebar() {
+        sidebar.classList.toggle('show');
+        overlay.classList.toggle('show');
+    }
+    sidebarToggle?.addEventListener('click', toggleSidebar);
+    sidebarMenuBtn?.addEventListener('click', toggleSidebar);
+    overlay?.addEventListener('click', toggleSidebar);
+
+    // Mobile nav toggle
+    const menuBtn = document.getElementById('menu');
+    const navLinks = document.getElementById('nav-links');
+    menuBtn?.addEventListener('click', () => navLinks.classList.toggle('show'));
+
+    // User dropdown
+    const trigger = document.getElementById('user-menu-trigger');
+    const dropdown = document.getElementById('user-dropdown');
+    trigger?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('show');
+    });
+    document.addEventListener('click', () => dropdown.classList.remove('show'));
+</script>
 </body>
 </html>
