@@ -15,42 +15,45 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username']) : 'زائر';
 
 <body>
 
-<!-- ===== Navbar ===== -->
+<!-- ===== HEADER ===== -->
 <header class="top-header">
     <div class="nav-container">
-        <div class="logo">
-            <img src="../assests/photo/photo_5823341587810339301_y.jpg" alt="Wise Tech Logo" class="logo-img" />
+        <div class="nav-icons">
+            <span class="menu" id="menu"><i class="fa-solid fa-bars"></i></span>
+            <div class="user-info" id="user-menu-trigger">
+                <i class="fa-solid fa-user"></i>
+                <span class="username" id="username"><?php echo $username; ?></span>
+                <i class="fa-solid fa-chevron-down" style="font-size:11px;"></i>
+            </div>
+            <a href="#" class="icon-box" id="search-icon" title="بحث"><i class="fa-solid fa-magnifying-glass"></i></a>
+            <a href="#" class="icon-box" id="cart-icon" title="السلة"><i class="fa-solid fa-cart-shopping"></i></a>
         </div>
+
         <nav class="nav-links" id="nav-links">
-            <a href="#home">الرئيسية</a>
+            <a href="#home" class="active">الرئيسية</a>
             <a href="#products">المنتجات</a>
             <a href="#warranty">الضمان</a>
             <a href="#contact">اتصل بنا</a>
             <?php if ($isLoggedIn): ?>
-                <a href="orders/orders.php">الطلبات</a>
+                <a href="orders/orders.php">طلباتي</a>
                 <a href="repairs/repairs.php">الصيانة</a>
             <?php endif; ?>
         </nav>
-        <div class="nav-icons">
-            <div class="user-info" id="user-menu-trigger">
-                <i class="fa-solid fa-user"></i>
-                <span class="username" id="username"><?php echo $username; ?></span>
-                <i class="fa-solid fa-chevron-down"></i>
-            </div>
-            <a href="#" class="icon-box" id="search-icon"><i class="fa-solid fa-magnifying-glass"></i></a>
-            <a href="#" class="icon-box" id="cart-icon"><i class="fa-solid fa-cart-shopping"></i></a>
-            <span class="menu" id="menu"><i class="fa-solid fa-bars"></i></span>
-        </div>
+
+        <a href="#home" class="logo">
+            <span class="logo-text">Wise<span>Tech</span></span>
+        </a>
     </div>
 
     <!-- USER DROPDOWN -->
     <div class="dropdown-menu" id="user-dropdown">
         <?php if ($isLoggedIn): ?>
-            <a href="orders/orders.php">الملف الشخصي</a>
-            <a href="../auth/logout.php">تسجيل الخروج</a>
+            <a href="orders/orders.php"><i class="fa-solid fa-box"></i> طلباتي</a>
+            <a href="repairs/repairs.php"><i class="fa-solid fa-wrench"></i> الصيانة</a>
+            <a href="../auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</a>
         <?php else: ?>
-            <a href="../auth/login.php">تسجيل الدخول</a>
-            <a href="../auth/register.php">إنشاء حساب</a>
+            <a href="../auth/login.php"><i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول</a>
+            <a href="../auth/register.php"><i class="fa-solid fa-user-plus"></i> إنشاء حساب</a>
         <?php endif; ?>
     </div>
 
@@ -104,9 +107,33 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username']) : 'زائر';
     </div>
 </header>
 
-<!-- ===== Products (Dynamically Loaded) ===== -->
+<!-- ===== HERO ===== -->
+<section class="hero-section" id="home">
+    <div class="hero-content">
+        <div class="hero-badge">
+            <i class="fa-solid fa-bolt"></i>
+            أفضل الأجهزة بأفضل الأسعار
+        </div>
+        <h1 class="hero-title">
+            تقنية <span>حديثة</span><br/>بين يديك الآن
+        </h1>
+        <p class="hero-subtitle">
+            اكتشف مجموعتنا المتميزة من الهواتف الذكية واللابتوبات مع ضمان الجودة وخدمة ما بعد البيع.
+        </p>
+        <a href="#products" class="hero-cta">
+            <i class="fa-solid fa-arrow-down"></i>
+            تصفح المنتجات
+        </a>
+    </div>
+</section>
+
+<!-- ===== PRODUCTS ===== -->
 <section class="products-section" id="products">
-    <h2 class="section-title">منتجاتنا</h2>
+    <div class="section-header">
+        <span class="section-label">منتجاتنا</span>
+        <h2 class="section-title">اختر جهازك المثالي</h2>
+        <div class="section-line"></div>
+    </div>
     <div class="products">
         <?php
         require_once '../include/db_connect.php';
@@ -119,39 +146,46 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username']) : 'زائر';
             <div class="product-card" data-category="<?= $p['category_id'] ?>">
                 <?php if (!empty($p['image_url'])): ?>
                     <div class="product-top">
-                        <img 
-                            src="../assests/uploads/<?= htmlspecialchars($p['image_url']) ?>" 
-                            alt="<?= htmlspecialchars($p['name_ar']) ?>" 
+                        <img
+                            src="../assests/uploads/<?= htmlspecialchars($p['image_url']) ?>"
+                            alt="<?= htmlspecialchars($p['name_ar']) ?>"
                             onclick="toggleDetails(this)" />
                         <div class="details">
-                            <p>📱 الرام: <?= htmlspecialchars($p['ram'] ?? 'غير محدد') ?></p>
-                            <p>💾 السعة: <?= htmlspecialchars($p['storage'] ?? 'غير محدد') ?></p>
-                            <p>📷 الكاميرا: <?= htmlspecialchars($p['camera'] ?? 'غير محدد') ?></p>
+                            <p><i class="fa-solid fa-memory" style="color:var(--primary);"></i> الرام: <?= htmlspecialchars($p['ram'] ?? 'غير محدد') ?></p>
+                            <p><i class="fa-solid fa-hard-drive" style="color:var(--primary);"></i> السعة: <?= htmlspecialchars($p['storage'] ?? 'غير محدد') ?></p>
+                            <p><i class="fa-solid fa-camera" style="color:var(--primary);"></i> الكاميرا: <?= htmlspecialchars($p['camera'] ?? 'غير محدد') ?></p>
                         </div>
                     </div>
                 <?php endif; ?>
                 <div class="product-bottom">
                     <h3><?= htmlspecialchars($p['name_ar']) ?></h3>
                     <p class="price"><?= number_format($p['price'], 2) ?> دج</p>
-                    <button class="buy-btn" 
+                    <button class="buy-btn"
                         data-id="<?= $p['id'] ?>"
                         data-name="<?= htmlspecialchars($p['name_ar']) ?>"
                         data-price="<?= $p['price'] ?>"
                         data-img="../assests/uploads/<?= htmlspecialchars($p['image_url']) ?>">
-                        شراء
+                        <i class="fa-solid fa-cart-plus"></i> أضف للسلة
                     </button>
                 </div>
             </div>
         <?php endforeach; else: ?>
-            <p style="text-align:center; width:100%;">لا توجد منتجات متاحة.</p>
+            <div class="empty-state" style="grid-column:1/-1">
+                <i class="fa-solid fa-box-open"></i>
+                <h3>لا توجد منتجات</h3>
+                <p>لا توجد منتجات متاحة حالياً، يرجى المحاولة لاحقاً.</p>
+            </div>
         <?php endif; ?>
     </div>
 </section>
 
-<!-- ===== Warranty Section ===== -->
+<!-- ===== WARRANTY ===== -->
 <section class="warranty-conditions" id="warranty">
-    <h2 class="warranty-title">شروط الضمان الأساسية</h2>
-    <div class="title-line"></div>
+    <div class="section-header">
+        <span class="section-label">الضمان</span>
+        <h2 class="section-title">شروط الضمان الأساسية</h2>
+        <div class="section-line"></div>
+    </div>
     <div class="conditions-container">
         <div class="condition-card">
             <div class="condition-number">1</div>
@@ -169,63 +203,49 @@ $username = $isLoggedIn ? htmlspecialchars($_SESSION['username']) : 'زائر';
         </div>
     </div>
 </section>
-<!-- ===== Contact Info ===== -->
+
+<!-- ===== CONTACT ===== -->
 <section class="contact-info-section" id="contact">
-  <div class="contact-wrapper">
-
-    <div class="contact-left">
-      <span class="contact-line"></span>
+    <div class="contact-wrapper">
+        <div class="contact-left">
+            <div class="section-label" style="text-align:right;">تواصل معنا</div>
+        </div>
+        <div class="contact-right">
+            <h2>Contact Info</h2>
+            <div class="contact-item">
+                <div class="icon-circle"><i class="fa-solid fa-location-dot"></i></div>
+                <div class="text">
+                    <h4>Address</h4>
+                    <p>Skikda, Algeria</p>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="icon-circle"><i class="fa-solid fa-phone"></i></div>
+                <div class="text">
+                    <h4>Phone</h4>
+                    <p>0655880712 - 0673633916</p>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="icon-circle"><i class="fa-solid fa-envelope"></i></div>
+                <div class="text">
+                    <h4>Email</h4>
+                    <p>contact@wisetech.dz</p>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="icon-circle"><i class="fa-solid fa-clock"></i></div>
+                <div class="text">
+                    <h4>Working Hours</h4>
+                    <p>24 / 7</p>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="contact-right">
-      <h2>Contact Info</h2>
-
-      <div class="contact-item">
-        <div class="icon-circle">
-          <i class="fa-solid fa-location-dot"></i>
-        </div>
-        <div class="text">
-          <h4>Address</h4>
-          <p>Skikda, Algeria</p>
-        </div>
-      </div>
-
-      <div class="contact-item">
-        <div class="icon-circle">
-          <i class="fa-solid fa-phone"></i>
-        </div>
-        <div class="text">
-          <h4>Phone</h4>
-          <p>0655880712 - 0673633916</p>
-        </div>
-      </div>
-
-      <div class="contact-item">
-        <div class="icon-circle">
-          <i class="fa-solid fa-envelope"></i>
-        </div>
-        <div class="text">
-          <h4>Email</h4>
-          <p>contact@wisetech.dz</p>
-        </div>
-      </div>
-
-      <div class="contact-item">
-        <div class="icon-circle">
-          <i class="fa-solid fa-clock"></i>
-        </div>
-        <div class="text">
-          <h4>Working Hours</h4>
-          <p>24 / 7</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
 </section>
 
 <footer class="footer">
-    <p>© 2025 Wise Tech - جميع الحقوق محفوظة</p>
+    <p>© 2025 <strong>Wise Tech</strong> - جميع الحقوق محفوظة</p>
 </footer>
 
 <script>
