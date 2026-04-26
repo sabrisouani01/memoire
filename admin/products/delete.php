@@ -1,41 +1,28 @@
 <?php
-// Include database connection
+/* Admin product delete — AJAX-friendly (no redirect) */
 include "../../include/db_connect.php";
 
-// Get and validate ID
-$id = $_GET['id'] ?? null;
+header('Content-Type: application/json');
 
-if (!$id || !is_numeric($id)) {
-    die("خطأ: المعرف غير صالح.");
-}
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+if ($id <= 0) { echo json_encode(['ok'=>false,'msg'=>'Invalid ID']); exit; }
 
-// Check if product exists
 $stmt = $pdo->prepare("SELECT image_url FROM products WHERE id = ?");
 $stmt->execute([$id]);
 $product = $stmt->fetch();
 
-if (!$product) {
-    die("المنتج غير موجود.");
-}
+if (!$product) { echo json_encode(['ok'=>false,'msg'=>'Not found']); exit; }
 
-// Delete the product
 try {
-    $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
-    $stmt->execute([$id]);
+    $pdo->prepare("DELETE FROM products WHERE id = ?")->execute([$id]);
 
-    // Optional: Delete image file from server
     $image_url = $product['image_url'];
     if ($image_url) {
         $image_path = "../../assests/uploads/" . basename($image_url);
-        if (file_exists($image_path)) {
-            unlink($image_path); // Remove file
-        }
+        if (file_exists($image_path)) unlink($image_path);
     }
 
-    // Redirect after success
-    header("Location: index.php");
-    exit;
+    echo json_encode(['ok'=>true]);
 } catch (PDOException $e) {
-    die("خطأ في الحذف: " . $e->getMessage());
+    echo json_encode(['ok'=>false,'msg'=>$e->getMessage()]);
 }
-?>

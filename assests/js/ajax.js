@@ -6,25 +6,32 @@ function loadPage(url) {
     const content = document.getElementById("content");
     if (!content) return;
     content.innerHTML = '<p style="padding:20px;color:#888;">Loading...</p>';
-    fetch(url)
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.text(); })
-        .then(html => { content.innerHTML = html; })
-        .catch(() => { content.innerHTML = '<p style="padding:20px;color:#e74c3c;">Page not found</p>'; });
+        .then(html => {
+            content.innerHTML = html;
+            /* Re-execute <script> tags */
+            content.querySelectorAll('script').forEach(oldScript => {
+                const newScript = document.createElement('script');
+                [...oldScript.attributes].forEach(a => newScript.setAttribute(a.name, a.value));
+                newScript.textContent = oldScript.textContent;
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+            if (typeof initAddProduct === 'function' && document.getElementById('imgDropzone')) {
+                initAddProduct();
+            }
+        })
+        .catch(err => { content.innerHTML = '<p style="padding:20px;color:#e74c3c;">Page not found: ' + err.message + '</p>'; });
 }
 
 /* ================================
-   sidebar navigation
+   Sidebar navigation
 ================================ */
 document.addEventListener("click", function (e) {
     const li = e.target.closest(".sidebar-menu li");
     if (!li) return;
-
-    document
-        .querySelectorAll(".sidebar-menu li")
-        .forEach(x => x.classList.remove("active"));
-
+    document.querySelectorAll(".sidebar-menu li").forEach(x => x.classList.remove("active"));
     li.classList.add("active");
-
     loadPage(li.dataset.page);
 });
 
@@ -37,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /* ================================
    Generic AJAX form (#addForm or .ajax-form)
+   — stays in layout, shows result message
 ================================ */
 document.addEventListener("submit", function (e) {
     if (!e.target || e.target.tagName !== "FORM") return;
@@ -65,19 +73,86 @@ document.addEventListener("submit", function (e) {
 });
 
 /* ================================
+   Edit product form — intercept submit,
+   POST via fetch, stay in layout
+================================ */
+document.addEventListener("submit", function (e) {
+    const form = e.target;
+    if (!form || form.id !== "editForm") return;
+    e.preventDefault();
+
+    const content  = document.getElementById("content");
+    const msgDiv   = document.getElementById("editMessage");
+    const submitBtn = form.querySelector('[name="update"]');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Saving…'; }
+
+    const formData = new FormData(form);
+    fetch(form.action, {
+        method: "POST",
+        headers: { "X-Requested-With": "XMLHttpRequest" },
+        body: formData
+    })
+    .then(res => res.text())
+    .then(msg => {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fa-solid fa-file-pen"></i> حفظ التغييرات'; }
+        /* show success banner inside the form page */
+        if (msgDiv) {
+            msgDiv.style.display  = 'block';
+            msgDiv.style.background = msg.includes('تم') ? '#dcfce7' : '#fee2e2';
+            msgDiv.style.color      = msg.includes('تم') ? '#166534' : '#991b1b';
+            msgDiv.textContent      = msg || 'Done';
+            setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+        }
+        /* reload the same edit page to show updated images/data */
+        const id = new URLSearchParams(form.action.split('?')[1]).get('id');
+        if (id) setTimeout(() => loadPage('products/edit.php?id=' + id), 1200);
+    })
+    .catch(err => {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fa-solid fa-file-pen"></i> حفظ التغييرات'; }
+        if (msgDiv) { msgDiv.style.display = 'block'; msgDiv.textContent = 'Error: ' + err.message; }
+    });
+});
+
+/* ================================
    Product filters
 ================================ */
 function loadProducts() {
-    const search   = document.getElementById("searchInput")?.value || "";
-    const stock    = document.getElementById("filterStock")?.value || "";
+    const search   = document.getElementById("searchInput")?.value   || "";
+    const stock    = document.getElementById("filterStock")?.value   || "";
     const category = document.getElementById("filterCategory")?.value || "";
     fetch("/memoire/admin/products/fillter_products.php?" + new URLSearchParams({ search, stock, category }))
         .then(res => res.text())
         .then(html => { const box = document.getElementById("productsList"); if (box) box.innerHTML = html; });
 }
-
-document.addEventListener("input",  e => { if (e.target.id === "searchInput") loadProducts(); });
+document.addEventListener("input",  e => { if (e.target.id === "searchInput")                            loadProducts(); });
 document.addEventListener("change", e => { if (e.target.id === "filterStock" || e.target.id === "filterCategory") loadProducts(); });
+
+/* ================================
+   Delete category — AJAX, no redirect
+================================ */
+document.addEventListener("click", function (e) {
+    const btn = e.target.closest(".delete-category");
+    if (!btn) return;
+    e.preventDefault();
+    e.stopImmediatePropagation(); // prevent ajax-link handler from also firing
+    if (!confirm("Delete this category?")) return;
+    const id = btn.dataset.id;
+    if (!id) return;
+
+    fetch("/memoire/admin/categories/delete.php?id=" + encodeURIComponent(id), {
+        redirect: 'manual'
+    })
+    .then(r => r.text().catch(() => ''))
+    .then(text => {
+        // If PHP returned an error message (Arabic or English), show it
+        const trimmed = text.trim();
+        if (trimmed && !trimmed.startsWith('<!') && trimmed.length < 300) {
+            alert(trimmed);
+        }
+        loadPage('categories/index.php');
+    })
+    .catch(() => { loadPage('categories/index.php'); });
+});
 
 /* ================================
    AJAX links (data-page)
@@ -87,19 +162,40 @@ document.addEventListener("click", function (e) {
     if (!link) return;
     e.preventDefault();
     let url = link.dataset.page;
+    if (!url) return;
     if (link.dataset.id) url += "?id=" + encodeURIComponent(link.dataset.id);
     loadPage(url);
 });
 
 /* ================================
-   Delete product
+   Delete product — AJAX, no redirect
 ================================ */
 document.addEventListener("click", function (e) {
     const btn = e.target.closest(".delete-product");
     if (!btn) return;
+    e.preventDefault();
     if (!confirm("Delete this product?")) return;
-    fetch("/memoire/admin/products/delete.php?id=" + btn.dataset.id)
-        .then(() => loadProducts());
+    const id = btn.dataset.id;
+    if (!id) return;
+
+    /* optimistic: remove the row immediately */
+    const row = btn.closest('.product-row');
+    if (row) row.remove();
+
+    fetch("/memoire/admin/products/delete.php?id=" + encodeURIComponent(id), {
+        redirect: 'manual'
+    })
+    .then(r => r.json().catch(() => ({ok: true})))
+    .then(data => {
+        if (data && data.ok === false) {
+            alert('Delete failed: ' + (data.msg || 'unknown error'));
+            loadPage('products/index.php');
+        } else {
+            // Reload the full products page to keep CSS + search + filters intact
+            loadPage('products/index.php');
+        }
+    })
+    .catch(() => { loadPage('products/index.php'); });
 });
 
 /* ================================
@@ -111,31 +207,22 @@ document.addEventListener("click", function (e) {
     if (!confirm("Delete this customer?")) return;
     if (!btn.dataset.id) return;
     fetch("/memoire/admin/customers/delete.php?id=" + btn.dataset.id)
-        .then(() => { btn.closest("tr").remove(); });
+        .then(() => { btn.closest("tr")?.remove(); });
 });
 
 /* ================================
-   Filter tabs — Repairs (All / Active / Completed)
-   and any other page with .tp-filter-btn
+   Filter tabs — Repairs / other pages
 ================================ */
 document.addEventListener("click", function (e) {
     const btn = e.target.closest(".tp-filter-btn");
     if (!btn) return;
-
-    // Update active tab visually
     document.querySelectorAll(".tp-filter-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-
-    const filter = btn.dataset.filter || "all";
-
-    // Get the current page from the active sidebar item
+    const filter     = btn.dataset.filter || "all";
     const activeLi   = document.querySelector(".sidebar-menu li.active");
-    let   currentPage = activeLi ? (activeLi.dataset.page || "Repairs/index") : "Repairs/index";
+    let   currentPage = activeLi ? (activeLi.dataset.page || "Repairs/index.php") : "Repairs/index.php";
     const base        = currentPage.split("?")[0];
     const basePath    = base.endsWith(".php") ? base : base + ".php";
-
     loadPage(basePath + "?filter=" + encodeURIComponent(filter));
-
-    // Keep sidebar item highlighted after reload
     if (activeLi) activeLi.classList.add("active");
 });

@@ -24,6 +24,7 @@ require "includes/admin_auth.php";
     include "includes/header.php";
     include "includes/sidebar.php";?>
     <div class="content" id="content"></div>
+    <script src="../assests/js/add_product.js"></script>
     <script src="../assests/js/ajax.js"></script>
     <script src="../assests/js/header.js"></script>
     <script src="../assests/js/order.js"></script>

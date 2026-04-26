@@ -261,6 +261,47 @@ CREATE TABLE `warranty_rules` (
   `description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ================================================================
+-- Migration: Add multi-image & per-color stock to products
+-- Database: wise_technologie
+-- ================================================================
+
+-- 1. Add extra_images column (JSON array of filenames)
+ALTER TABLE `products`
+    ADD COLUMN `extra_images` TEXT DEFAULT NULL COMMENT 'JSON array of extra image filenames'
+    AFTER `image_url`;
+
+-- 2. Add legacy colors column (kept for backwards compat – JSON hex array)
+ALTER TABLE `products`
+    ADD COLUMN `colors` TEXT DEFAULT NULL COMMENT 'JSON array of hex color strings (legacy)'
+    AFTER `extra_images`;
+
+-- ================================================================
+-- 3. New table: product_colors
+--    One row per (product, color) with its own stock quantity.
+--    When stock_quantity = 0 the color is considered OUT OF STOCK.
+-- ================================================================
+CREATE TABLE `product_colors` (
+    `id`             INT(11)      NOT NULL AUTO_INCREMENT,
+    `product_id`     INT(11)      NOT NULL,
+    `color_hex`      VARCHAR(9)   NOT NULL COMMENT 'e.g. #FF0000',
+    `color_label`    VARCHAR(80)  DEFAULT NULL COMMENT 'Optional human label',
+    `stock_quantity` INT(11)      NOT NULL DEFAULT 0,
+    `created_at`     TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_product_id` (`product_id`),
+    CONSTRAINT `product_colors_ibfk_1`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `products` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ================================================================
+-- Example: how a "red out-of-stock" entry looks
+--   INSERT INTO product_colors (product_id, color_hex, color_label, stock_quantity)
+--   VALUES (1, '#FF0000', 'Rouge', 0);
+-- ================================================================
+
 --
 -- Indexes for dumped tables
 --

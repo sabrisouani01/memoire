@@ -155,3 +155,61 @@
     border-color: #245bff;
     color: #fff;
 }
+/* ══ add.php extra styles ══════════════════════════════════ */
+
+/* ── Layout helpers ── */
+.fields-row{display:grid;grid-template-columns:1fr 1fr;gap:0 28px}
+.section-card{margin-top:34px;background:#f7f9ff;border:1.5px solid #d6e0ff;border-radius:12px;padding:20px 22px}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;font-weight:600;color:#1439aa;font-size:14px}
+.section-header i{font-size:18px;color:#245bff}
+.section-header small{margin-left:auto;font-weight:400;color:#888;font-size:12px}
+
+/* ── Dropzone ── */
+.img-dropzone{border:2px dashed #245bff;border-radius:10px;padding:26px 20px;text-align:center;cursor:pointer;transition:background .2s;color:#1439aa}
+.img-dropzone:hover,.img-dropzone.drag-over{background:#eef2ff}
+.img-dropzone i{font-size:36px;margin-bottom:8px;color:#245bff;display:block}
+.img-dropzone p{font-size:14px;font-weight:600;margin:0}
+.img-dropzone span{font-size:12px;color:#888}
+
+/* ── Image grid ── */
+.img-preview-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.img-preview-item{position:relative;width:90px;height:90px;border-radius:9px;overflow:hidden;border:2.5px solid #245bff;box-shadow:0 2px 8px rgba(36,91,255,.18)}
+.img-preview-item img{width:100%;height:100%;object-fit:cover}
+.remove-img{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:rgba(220,30,30,.88);color:#fff;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;line-height:1}
+.remove-img:hover{background:#c00}
+.primary-badge{position:absolute;bottom:3px;left:3px;background:#245bff;color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700}
+
+/* ── Color controls ── */
+.color-add-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+#colorPicker{width:46px;height:38px;border:2px solid #1439aa;border-radius:8px;cursor:pointer;padding:2px;background:#fff;flex-shrink:0}
+.color-label-inp{flex:1;min-width:110px;height:38px;border:1.5px solid #c0caff;border-radius:8px;padding:0 10px;font-size:13px;color:#1439aa;outline:none}
+.color-label-inp:focus{border-color:#245bff}
+.color-stock-inp{width:90px;height:38px;border:1.5px solid #c0caff;border-radius:8px;padding:0 10px;font-size:13px;color:#1439aa;outline:none}
+.color-stock-inp:focus{border-color:#245bff}
+.color-add-btn{padding:8px 18px;border-radius:30px;border:2px solid #1439aa;background:transparent;color:#1439aa;font-size:13px;font-weight:600;cursor:pointer;transition:.25s;white-space:nowrap}
+.color-add-btn:hover{background:#245bff;border-color:#245bff;color:#fff}
+
+.color-presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.preset-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.preset-swatch:hover{transform:scale(1.2);box-shadow:0 0 6px rgba(36,91,255,.5)}
+
+/* ── Color chips ── */
+.selected-colors{display:flex;flex-direction:column;gap:8px;min-height:10px}
+.color-chip{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:10px;border:1.5px solid #d6e0ff;background:#fff;font-size:13px}
+.chip-dot{width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(0,0,0,.12);flex-shrink:0}
+.chip-info{flex:1;display:flex;flex-direction:column;line-height:1.3}
+.chip-hex{font-weight:700;color:#1439aa;font-size:12px}
+.chip-label{color:#666;font-size:11px}
+.chip-stock-wrap{display:flex;align-items:center;gap:6px}
+.chip-stock-wrap label{font-size:11px;color:#888;white-space:nowrap}
+.chip-stock-input{width:72px;height:28px;border:1.5px solid #c0caff;border-radius:6px;padding:0 8px;font-size:12px;color:#1439aa;outline:none;text-align:center}
+.chip-stock-input:focus{border-color:#245bff}
+.stock-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+.stock-badge.in{background:#d1fae5;color:#065f46}
+.stock-badge.out{background:#fee2e2;color:#991b1b}
+.chip-remove{background:none;border:none;cursor:pointer;color:#bbb;font-size:16px;padding:0;transition:color .2s;margin-left:4px}
+.chip-remove:hover{color:#e00}
+
+/* ── Error / success message ── */
+.product-message.error-msg{background:#fee2e2;color:#991b1b;margin:15px 40px;padding:12px;border-radius:6px;text-align:center}
+.product-message.success-msg{background:#d1fae5;color:#065f46;margin:15px 40px;padding:12px;border-radius:6px;text-align:center}
