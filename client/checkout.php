@@ -31,10 +31,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cart_data'])) {
         }
 
         $cartItems[] = [
-            'id' => $product['id'],
-            'name_ar' => $product['name_ar'],
-            'price' => (float)$product['price'],
-            'quantity' => $requestedQty
+            'id'             => $product['id'],
+            'name_ar'        => $product['name_ar'],
+            'price'          => (float)$product['price'],
+            'quantity'       => $requestedQty,
+            'img'            => $item['img']      ?? '',
+            'color'          => $item['color']    ?? '',
+            'colorHex'       => $item['colorHex'] ?? '',
         ];
     }
 
@@ -98,11 +101,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['cart_data'])) {
             $orderId = $pdo->lastInsertId();
 
             $itemStmt = $pdo->prepare("
-                INSERT INTO order_items (order_id, product_id, quantity, unit_price)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO order_items (order_id, product_id, quantity, unit_price, selected_color)
+                VALUES (?, ?, ?, ?, ?)
             ");
             foreach ($cartItems as $item) {
-                $itemStmt->execute([$orderId, $item['id'], $item['quantity'], $item['price']]);
+                $colorStr = '';
+                if (!empty($item['color']) && !empty($item['colorHex'])) {
+                    $colorStr = $item['color'] . ' (' . $item['colorHex'] . ')';
+                } elseif (!empty($item['colorHex'])) {
+                    $colorStr = $item['colorHex'];
+                } elseif (!empty($item['color'])) {
+                    $colorStr = $item['color'];
+                }
+                $itemStmt->execute([$orderId, $item['id'], $item['quantity'], $item['price'], $colorStr]);
             }
 
             $updateStock = $pdo->prepare("
@@ -121,7 +132,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['cart_data'])) {
             unset($_SESSION['checkout_total']);
 
             $pdo->commit();
-            header("Location: ../client/orders/orders.php?order_success=1");
+            // Store success flag for JS to clear cart
+            $_SESSION['cart_just_ordered'] = true;
+            header("Location: orders/orders.php?order_success=1");
             exit();
 
         } catch (Exception $e) {
@@ -748,11 +761,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['cart_data'])) {
                     <div class="basket-items">
                         <?php foreach ($cartItems as $item): ?>
                         <div class="basket-item">
-                            <div class="item-icon">
-                                <i class="fa-solid fa-mobile-screen-button"></i>
-                            </div>
+                            <?php if (!empty($item['img'])): ?>
+                            <img src="<?= htmlspecialchars($item['img']) ?>" alt="<?= htmlspecialchars($item['name_ar']) ?>"
+                                 style="width:52px;height:52px;object-fit:cover;border-radius:10px;border:1px solid var(--gray-5);flex-shrink:0;"
+                                 onerror="this.style.display='none'">
+                            <?php else: ?>
+                            <div class="item-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                            <?php endif; ?>
                             <div class="item-details">
                                 <div class="item-name"><?= htmlspecialchars($item['name_ar']) ?></div>
+                                <?php if (!empty($item['colorHex'])): ?>
+                                <div style="display:inline-flex;align-items:center;gap:4px;background:#f1f5f9;border-radius:20px;padding:2px 8px;font-size:11px;color:#475569;margin:3px 0;" >
+                                    <span style="width:10px;height:10px;border-radius:50%;background:<?= htmlspecialchars($item['colorHex']) ?>;border:1px solid rgba(0,0,0,.12);display:inline-block;"></span>
+                                    <?= htmlspecialchars($item['color'] ?? '') ?>
+                                </div>
+                                <?php endif; ?>
                                 <div class="item-qty">الكمية: <?= $item['quantity'] ?> × <?= number_format($item['price'], 0) ?> دج</div>
                             </div>
                             <div class="item-price">

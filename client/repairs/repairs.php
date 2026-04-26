@@ -80,6 +80,7 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الصيانة - Wise Tech</title>
     <link rel="stylesheet" href="../../assests/css/user.css">
+    <link rel="stylesheet" href="../../assests/css/enhancements.css">
     <script src="https://kit.fontawesome.com/4060ace190.js" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -89,6 +90,7 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
     <div class="nav-container">
         <div class="nav-icons">
             <span class="menu" id="menu"><i class="fa-solid fa-bars"></i></span>
+            <div class="page-lang-switcher" id="lang-switcher-page"></div>
             <div class="user-info" id="user-menu-trigger">
                 <i class="fa-solid fa-user"></i>
                 <span class="username"><?= $username ?></span>
@@ -97,9 +99,9 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
         </div>
 
         <nav class="nav-links" id="nav-links">
-            <a href="../index.php">الرئيسية</a>
-            <a href="../orders/orders.php">طلباتي</a>
-            <a href="repairs.php" class="active">الصيانة</a>
+            <a href="../index.php" data-i18n-page="nav_home">الرئيسية</a>
+            <a href="../orders/orders.php" data-i18n-page="nav_orders">طلباتي</a>
+            <a href="repairs.php" class="active" data-i18n-page="repairs_title">الصيانة</a>
         </nav>
 
         <a href="../index.php" class="logo">
@@ -109,9 +111,9 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
 
     <!-- USER DROPDOWN -->
     <div class="dropdown-menu" id="user-dropdown">
-        <a href="../index.php"><i class="fa-solid fa-house"></i> الرئيسية</a>
-        <a href="../orders/orders.php"><i class="fa-solid fa-box"></i> طلباتي</a>
-        <a href="../../auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</a>
+        <a href="../index.php"><i class="fa-solid fa-house"></i> <span data-i18n-page="nav_home">الرئيسية</span></a>
+        <a href="../orders/orders.php"><i class="fa-solid fa-box"></i> <span data-i18n-page="nav_orders">طلباتي</span></a>
+        <a href="../../auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n-page="nav_logout">تسجيل الخروج</span></a>
     </div>
 </header>
 
@@ -124,26 +126,26 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
             <span class="sidebar-logo-text">Wise<span>Tech</span></span>
         </div>
 
-        <p class="sidebar-section-label">التنقل</p>
+        <p class="sidebar-section-label" data-i18n-page="sidebar_nav">التنقل</p>
         <ul class="sidebar-nav">
-            <li><a href="../index.php"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
-            <li><a href="../orders/orders.php"><i class="fa-solid fa-box"></i> طلباتي</a></li>
-            <li><a href="repairs.php" class="active"><i class="fa-solid fa-screwdriver-wrench"></i> طلبات الصيانة</a></li>
+            <li><a href="../index.php"><i class="fa-solid fa-house"></i> <span data-i18n-page="nav_home">الرئيسية</span></a></li>
+            <li><a href="../orders/orders.php"><i class="fa-solid fa-box"></i> <span data-i18n-page="nav_orders">طلباتي</span></a></li>
+            <li><a href="repairs.php" class="active"><i class="fa-solid fa-screwdriver-wrench"></i> <span data-i18n-page="repairs_title">الصيانة</span></a></li>
         </ul>
 
         <hr class="sidebar-divider">
 
-        <p class="sidebar-section-label">طلب صيانة</p>
+        <p class="sidebar-section-label" data-i18n-page="repairs_new_req">طلب صيانة</p>
         <ul class="sidebar-nav">
-            <li><a href="#new-repair-section"><i class="fa-solid fa-plus-circle"></i> طلب جديد</a></li>
-            <li><a href="#history-section"><i class="fa-solid fa-history"></i> السجل</a></li>
+            <li><a href="#new-repair-section"><i class="fa-solid fa-plus-circle"></i> <span data-i18n-page="repairs_new">طلب جديد</span></a></li>
+            <li><a href="#history-section"><i class="fa-solid fa-history"></i> <span data-i18n-page="repairs_history">السجل</span></a></li>
         </ul>
 
         <hr class="sidebar-divider">
 
-        <p class="sidebar-section-label">الحساب</p>
+        <p class="sidebar-section-label" data-i18n-page="sidebar_account">الحساب</p>
         <ul class="sidebar-nav">
-            <li><a href="../../auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</a></li>
+            <li><a href="../../auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n-page="nav_logout">تسجيل الخروج</span></a></li>
         </ul>
     </aside>
 
@@ -155,14 +157,14 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
 
         <!-- Breadcrumb -->
         <div class="breadcrumb">
-            <a href="../index.php">الرئيسية</a>
+            <a href="../index.php" data-i18n-page="nav_home">الرئيسية</a>
             <span>/</span>
             <span>الصيانة</span>
         </div>
 
         <div class="page-header">
-            <h1><i class="fa-solid fa-screwdriver-wrench" style="color:var(--primary);margin-left:8px;font-size:24px;"></i> طلبات الصيانة</h1>
-            <p>قدّم طلب صيانة لمنتجاتك أو تابع طلباتك السابقة</p>
+            <h1><i class="fa-solid fa-screwdriver-wrench" style="color:var(--primary);margin-left:8px;font-size:24px;"></i> <span data-i18n-page="repairs_title">طلبات الصيانة</span></h1>
+            <p data-i18n-page="repairs_subtitle">قدّم طلب صيانة لمنتجاتك أو تابع طلباتك السابقة</p>
         </div>
 
         <!-- Alert Messages -->
@@ -189,34 +191,34 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
         <div class="stats-strip">
             <div class="stat-card">
                 <div class="stat-value"><?= $totalRepairs ?></div>
-                <div class="stat-label">إجمالي الطلبات</div>
+                <div class="stat-label" data-i18n-page="repairs_total">إجمالي الطلبات</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" style="color:var(--accent);"><?= $pendingRepairs ?></div>
-                <div class="stat-label">قيد الانتظار</div>
+                <div class="stat-label" data-i18n-page="repairs_pending_r">قيد الانتظار</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" style="color:var(--success);"><?= $completedRepairs ?></div>
-                <div class="stat-label">مكتملة</div>
+                <div class="stat-label" data-i18n-page="repairs_completed">مكتملة</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" style="color:var(--primary);"><?= count($deliveredItems) ?></div>
-                <div class="stat-label">منتجات مُسلَّمة</div>
+                <div class="stat-label" data-i18n-page="repairs_delivered_items">منتجات مُسلَّمة</div>
             </div>
         </div>
 
         <!-- ===== NEW REPAIR FORM ===== -->
         <div id="new-repair-section">
             <div class="card">
-                <div class="card-title"><i class="fa-solid fa-plus-circle"></i> تقديم طلب صيانة جديد</div>
+                <div class="card-title"><i class="fa-solid fa-plus-circle"></i> <span data-i18n-page="repairs_new_card">تقديم طلب صيانة جديد</span></div>
 
                 <!-- Tabs -->
                 <div class="tabs">
                     <button class="tab-btn active" onclick="showTab('internal', this)">
-                        <i class="fa-solid fa-box"></i> منتجات من الموقع
+                        <i class="fa-solid fa-box"></i> <span data-i18n-page="repairs_tab_internal">منتجات من الموقع</span>
                     </button>
                     <button class="tab-btn" onclick="showTab('external', this)">
-                        <i class="fa-solid fa-store"></i> منتجات من المتجر
+                        <i class="fa-solid fa-store"></i> <span data-i18n-page="repairs_tab_external">منتجات من المتجر</span>
                     </button>
                 </div>
 
@@ -254,7 +256,7 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
                             </div>
 
                             <button type="submit" class="btn-submit">
-                                <i class="fa-solid fa-paper-plane"></i> إرسال طلب الصيانة
+                                <i class="fa-solid fa-paper-plane"></i> <span data-i18n-page="repairs_submit">إرسال طلب الصيانة</span>
                             </button>
                         </form>
                     <?php else: ?>
@@ -294,7 +296,7 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
                         </div>
 
                         <button type="submit" class="btn-submit">
-                            <i class="fa-solid fa-paper-plane"></i> إرسال طلب الصيانة
+                            <i class="fa-solid fa-paper-plane"></i> <span data-i18n-page="repairs_submit">إرسال طلب الصيانة</span>
                         </button>
                     </form>
 
@@ -309,7 +311,7 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
         <!-- ===== PAST REPAIRS ===== -->
         <div id="history-section">
             <div class="card">
-                <div class="card-title"><i class="fa-solid fa-history"></i> طلبات الصيانة السابقة</div>
+                <div class="card-title"><i class="fa-solid fa-history"></i> <span data-i18n-page="repairs_history_card">طلبات الصيانة السابقة</span></div>
 
                 <?php if (empty($repairs)): ?>
                     <div class="empty-state">
@@ -371,7 +373,7 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
                                               onsubmit="return confirm('هل أنت متأكد من حذف هذا الطلب؟');">
                                             <input type="hidden" name="repair_id" value="<?= $r['id'] ?>">
                                             <button type="submit" class="delete-btn">
-                                                <i class="fa-solid fa-trash"></i> حذف
+                                                <i class="fa-solid fa-trash"></i> <span data-i18n-page="btn_delete">حذف</span>
                                             </button>
                                         </form>
                                     <?php else: ?>
@@ -439,5 +441,6 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
     });
     document.addEventListener('click', () => dropdown.classList.remove('show'));
 </script>
+<script src="../../assests/js/i18n_pages.js"></script>
 </body>
 </html>
