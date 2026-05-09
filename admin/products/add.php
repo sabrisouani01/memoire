@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "جميع الحقول المطلوبة يجب ملؤها.";
     } else {
 
-        $uploadDir = "../../assests/uploads/";
+        $uploadDir = __DIR__ . "/../../assests/uploads/";
         if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
         $savedImages = [];
@@ -90,7 +90,7 @@ if ($isAjax && $message) { echo $message; exit; }
 
 $cats = $pdo->query("SELECT * FROM categories ORDER BY name_ar")->fetchAll();
 ?>
-<div class="product-container" style="width:740px;min-height:auto;">
+<div class="product-container">
 
     <h2 class="title">
         <i class="fa-solid fa-plus"></i> إضافة منتج جديد

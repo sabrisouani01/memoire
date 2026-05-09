@@ -3,6 +3,9 @@
    Called by initAddProduct() after the page fragment is injected.
 ══════════════════════════════════════════════════════════════ */
 
+/* exposed so ajax.js can read the selected files when building FormData */
+window._addProductFileList = [];
+
 function initAddProduct() {
 
     /* ══ IMAGE HANDLING ════════════════════════════════════════ */
@@ -13,6 +16,7 @@ function initAddProduct() {
     if (!dropzone || !fileInput || !previewGrid) return; // guard: not on this page
 
     let fileList = [];
+    window._addProductFileList = fileList; // keep the global reference pointing at this array
 
     dropzone.addEventListener('click', () => fileInput.click());
 
@@ -36,6 +40,7 @@ function initAddProduct() {
             if (!f.type.startsWith('image/') || fileList.length >= 10) return;
             fileList.push(f);
         });
+        window._addProductFileList = fileList;
         renderPreviews();
         syncInput();
     }
@@ -58,6 +63,7 @@ function initAddProduct() {
         previewGrid.querySelectorAll('.remove-img').forEach(btn =>
             btn.addEventListener('click', () => {
                 fileList.splice(+btn.dataset.idx, 1);
+                window._addProductFileList = fileList;
                 renderPreviews();
                 syncInput();
             })

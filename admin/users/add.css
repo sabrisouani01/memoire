@@ -10,9 +10,9 @@
 /* ================= CONTAINER ================= */
 .main-container{
     position: relative;
-    width: 550px;
-    min-height: 850px;
-    margin: 100px auto;
+    width: min(550px, 100%);
+    min-height: auto;
+    margin: 30px auto;
     background: #fff;
     border: 2px solid #245bff;
     box-shadow: 0 0 25px rgba(36,91,255,.35);
@@ -42,7 +42,7 @@
 /* ================= FORM BOX (FIXED RIGHT) ================= */
 .form-box.admin{
     width: 100%;
-    padding: 20px 60px 40px;
+    padding: 20px clamp(20px, 8%, 60px) 40px;
     display: flex;
     flex-direction: column;
 }
