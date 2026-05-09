@@ -52,6 +52,15 @@ document.addEventListener("submit", function (e) {
     if (e.target.method.toLowerCase() !== "post") return;
     e.preventDefault();
     const formData = new FormData(e.target, e.submitter || null);
+
+    /* ── If this is the product add form, replace the file input data
+          with the JS-managed fileList (DataTransfer trick is unreliable
+          across browsers when the form is inside an AJAX-loaded fragment) ── */
+    if (document.getElementById('imgDropzone')) {
+        formData.delete('images[]');
+        const files = window._addProductFileList || [];
+        files.forEach(f => formData.append('images[]', f, f.name));
+    }
     fetch(e.target.action || window.location.href, {
         method: "POST",
         headers: { "X-Requested-With": "XMLHttpRequest" },
@@ -64,6 +73,28 @@ document.addEventListener("submit", function (e) {
         if (msg.trim().toLowerCase() === "success") {
             e.target.reset();
             loadPage("dashboard/dashbord.php");
+        }
+        /* ── Product add form: reset after Arabic/English success ── */
+        const isProductSuccess = msg.includes('تم إضافة') || msg.includes('Account created successfully');
+        if (isProductSuccess) {
+            e.target.reset();
+            /* clear image previews + file list */
+            window._addProductFileList = [];
+            const grid = document.getElementById('imgPreviewGrid');
+            if (grid) grid.innerHTML = '';
+            const fi = document.getElementById('imagesInput');
+            if (fi) { try { fi.value = ''; } catch(_) {} }
+            /* clear color chips */
+            const colorDiv = document.getElementById('selectedColors');
+            if (colorDiv) colorDiv.innerHTML = '';
+            const colorJson = document.getElementById('colorsJsonInput');
+            if (colorJson) colorJson.value = '';
+            /* re-init so the dropzone works again */
+            if (typeof initAddProduct === 'function' && document.getElementById('imgDropzone')) {
+                initAddProduct();
+            }
+            /* auto-hide message after 3s */
+            if (box) setTimeout(() => { box.style.display = 'none'; }, 3000);
         }
     })
     .catch(() => {

@@ -113,7 +113,7 @@ if ($isAjax && $message) {
             </div>
 
             <button type= "submit" class="btn2 btn-primary">Add</button>
-            <button type= "button" class="btn2 btn-secendry" onclick = "loadpage('../layout')">Return</button>
+            <button type= "button" class="btn2 btn-secendry" onclick="loadPage('dashboard/dashbord.php')">Return</button>
             
         </form></div>
        

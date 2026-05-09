@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $desc_fr  = trim($_POST['desc_fr']  ?? '');
     $desc_en  = trim($_POST['desc_en']  ?? '');
 
-    $uploadDir = "../../assests/uploads/";
+    $uploadDir = __DIR__ . "/../../assests/uploads/";
     if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
     /* ── Primary image ──────────────────────────────────────── */
