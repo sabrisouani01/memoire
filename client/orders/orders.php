@@ -48,14 +48,14 @@ $totalSpent     = array_sum(array_column($orders, 'total_amount'));
             <div class="page-lang-switcher" id="lang-switcher-page"></div>
         </div>
         <nav class="nav-links" id="nav-links">
-            <a href="../index.php"           data-i18n-page="nav_home">الرئيسية</a>
+            <a href="../../index.php"           data-i18n-page="nav_home">الرئيسية</a>
             <a href="orders.php" class="active" data-i18n-page="nav_orders">طلباتي</a>
             <a href="../repairs/repairs.php" data-i18n-page="nav_repairs">الصيانة</a>
         </nav>
-        <a href="../index.php" class="logo"><span class="logo-text">Wise<span>Tech</span></span></a>
+        <a href="../../index.php" class="logo"><span class="logo-text">Wise<span>Tech</span></span></a>
     </div>
     <div class="dropdown-menu" id="user-dropdown">
-        <a href="../index.php"><i class="fa-solid fa-house"></i> <span data-i18n-page="nav_home">الرئيسية</span></a>
+        <a href="../../index.php"><i class="fa-solid fa-house"></i> <span data-i18n-page="nav_home">الرئيسية</span></a>
         <a href="../repairs/repairs.php"><i class="fa-solid fa-wrench"></i> <span data-i18n-page="nav_repairs">الصيانة</span></a>
         <a href="../../auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n-page="nav_logout">تسجيل الخروج</span></a>
     </div>
@@ -66,7 +66,7 @@ $totalSpent     = array_sum(array_column($orders, 'total_amount'));
         <div class="sidebar-logo"><span class="sidebar-logo-text">Wise<span>Tech</span></span></div>
         <p class="sidebar-section-label" data-i18n-page="sidebar_nav">التنقل</p>
         <ul class="sidebar-nav">
-            <li><a href="../index.php"><i class="fa-solid fa-house"></i> <span data-i18n-page="nav_home">الرئيسية</span></a></li>
+            <li><a href="../../index.php"><i class="fa-solid fa-house"></i> <span data-i18n-page="nav_home">الرئيسية</span></a></li>
             <li><a href="orders.php" class="active"><i class="fa-solid fa-box"></i> <span data-i18n-page="nav_orders">طلباتي</span></a></li>
             <li><a href="../repairs/repairs.php"><i class="fa-solid fa-screwdriver-wrench"></i> <span data-i18n-page="nav_repairs">الصيانة</span></a></li>
         </ul>
@@ -86,7 +86,7 @@ $totalSpent     = array_sum(array_column($orders, 'total_amount'));
 
     <main class="main-content">
         <div class="breadcrumb">
-            <a href="../index.php" data-i18n-page="nav_home">الرئيسية</a>
+            <a href="../../index.php" data-i18n-page="nav_home">الرئيسية</a>
             <span>/</span>
             <span data-i18n-page="nav_orders">طلباتي</span>
         </div>
@@ -119,7 +119,7 @@ $totalSpent     = array_sum(array_column($orders, 'total_amount'));
                     <i class="fa-solid fa-box-open"></i>
                     <h3 data-i18n-page="orders_empty">لا توجد طلبات</h3>
                     <p data-i18n-page="orders_empty_sub">ابدأ التسوق الآن!</p><br>
-                    <a href="../index.php" class="btn btn-primary"><i class="fa-solid fa-store"></i> <span data-i18n-page="orders_browse">تصفح المنتجات</span></a>
+                    <a href="../../index.php" class="btn btn-primary"><i class="fa-solid fa-store"></i> <span data-i18n-page="orders_browse">تصفح المنتجات</span></a>
                 </div>
             <?php else: ?>
                 <div class="table-wrapper">
@@ -184,7 +184,7 @@ $totalSpent     = array_sum(array_column($orders, 'total_amount'));
 
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
             <a href="../repairs/repairs.php" class="btn btn-primary"><i class="fa-solid fa-screwdriver-wrench"></i> <span data-i18n-page="btn_maintenance">طلب صيانة</span></a>
-            <a href="../index.php" class="btn btn-ghost"><i class="fa-solid fa-house"></i> <span data-i18n-page="btn_home">الرئيسية</span></a>
+            <a href="../../index.php" class="btn btn-ghost"><i class="fa-solid fa-house"></i> <span data-i18n-page="btn_home">الرئيسية</span></a>
         </div>
     </main>
 </div>

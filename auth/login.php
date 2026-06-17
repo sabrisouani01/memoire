@@ -38,9 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     } elseif ($user['role'] === 'technician') {
                         header("Location: ../technician/layout.php");
                     } else {
-
-                        header("Location: ../client/index.php");
-
+                        header("Location: ../index.php");
                     }
                     exit;
                 }

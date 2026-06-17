@@ -127,12 +127,7 @@ document.getElementById('search-form')?.addEventListener('submit', function(e) {
 });
 
 /* ===== BUY BUTTON ===== */
-document.addEventListener('click', e => {
-  if (e.target.closest('.buy-btn')) {
-    alert('يرجى تسجيل الدخول لإتمام عملية الشراء.');
-    window.location.href = 'auth/login.php';
-  }
-});
+// Handled by popup.js — openProductPopup() is called directly from onclick attributes.
 
 /* ===== SCROLL REVEAL (simple fade-in) ===== */
 const observer = new IntersectionObserver(entries => {
