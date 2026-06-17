@@ -99,19 +99,19 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
         </div>
 
         <nav class="nav-links" id="nav-links">
-            <a href="../index.php" data-i18n-page="nav_home">الرئيسية</a>
+            <a href="../../index.php" data-i18n-page="nav_home">الرئيسية</a>
             <a href="../orders/orders.php" data-i18n-page="nav_orders">طلباتي</a>
             <a href="repairs.php" class="active" data-i18n-page="repairs_title">الصيانة</a>
         </nav>
 
-        <a href="../index.php" class="logo">
+        <a href="../../index.php" class="logo">
             <span class="logo-text">Wise<span>Tech</span></span>
         </a>
     </div>
 
     <!-- USER DROPDOWN -->
     <div class="dropdown-menu" id="user-dropdown">
-        <a href="../index.php"><i class="fa-solid fa-house"></i> <span data-i18n-page="nav_home">الرئيسية</span></a>
+        <a href="../../index.php"><i class="fa-solid fa-house"></i> <span data-i18n-page="nav_home">الرئيسية</span></a>
         <a href="../orders/orders.php"><i class="fa-solid fa-box"></i> <span data-i18n-page="nav_orders">طلباتي</span></a>
         <a href="../../auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n-page="nav_logout">تسجيل الخروج</span></a>
     </div>
@@ -128,7 +128,7 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
 
         <p class="sidebar-section-label" data-i18n-page="sidebar_nav">التنقل</p>
         <ul class="sidebar-nav">
-            <li><a href="../index.php"><i class="fa-solid fa-house"></i> <span data-i18n-page="nav_home">الرئيسية</span></a></li>
+            <li><a href="../../index.php"><i class="fa-solid fa-house"></i> <span data-i18n-page="nav_home">الرئيسية</span></a></li>
             <li><a href="../orders/orders.php"><i class="fa-solid fa-box"></i> <span data-i18n-page="nav_orders">طلباتي</span></a></li>
             <li><a href="repairs.php" class="active"><i class="fa-solid fa-screwdriver-wrench"></i> <span data-i18n-page="repairs_title">الصيانة</span></a></li>
         </ul>
@@ -157,7 +157,7 @@ $completedRepairs = count(array_filter($repairs, fn($r) => $r['status'] === 'com
 
         <!-- Breadcrumb -->
         <div class="breadcrumb">
-            <a href="../index.php" data-i18n-page="nav_home">الرئيسية</a>
+            <a href="../../index.php" data-i18n-page="nav_home">الرئيسية</a>
             <span>/</span>
             <span>الصيانة</span>
         </div>

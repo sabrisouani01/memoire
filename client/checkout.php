@@ -635,7 +635,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['cart_data'])) {
 
 <!-- Top Bar -->
 <header class="topbar">
-    <a href="../client/index.php" class="topbar-logo">Wise<span>Tech</span></a>
+    <a href="../index.php" class="topbar-logo">Wise<span>Tech</span></a>
     <div class="topbar-steps">
         <div class="step active"><i class="fa-solid fa-cart-shopping"></i> السلة</div>
         <div class="sep"><i class="fa-solid fa-chevron-left"></i></div>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 19, 2026 at 11:04 AM
+-- Generation Time: Jun 17, 2026 at 10:27 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,9 @@ SET time_zone = "+00:00";
 --
 -- Database: `wise_technologie`
 --
+
+CREATE DATABASE IF NOT EXISTS `wise_technologie`;
+USE `wise_technologie`;
 
 -- --------------------------------------------------------
 
@@ -56,7 +59,8 @@ CREATE TABLE `categories` (
 
 INSERT INTO `categories` (`id`, `name_ar`, `name_fr`, `name_en`, `warranty_duration`, `created_at`) VALUES
 (1, 'الهواتف', 'Téléphones', 'Phones', '9 اشهر', '2025-08-25 21:08:59'),
-(2, 'لابتوبات', 'Ordinateurs portables', 'Laptops', '12 شهر', '2025-08-25 21:08:59');
+(2, 'لابتوبات', 'Ordinateurs portables', 'Laptops', '12 شهر', '2025-08-25 21:08:59'),
+(3, 'tablet', 'tablette', 'tablet', '9 month', '2026-06-15 20:08:14');
 
 -- --------------------------------------------------------
 
@@ -94,15 +98,16 @@ CREATE TABLE `order_items` (
   `order_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
   `quantity` int(11) NOT NULL,
-  `unit_price` decimal(10,2) NOT NULL
+  `unit_price` decimal(10,2) NOT NULL,
+  `selected_color` varchar(80) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `order_items`
 --
 
-INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `unit_price`) VALUES
-(1, 1, 1, 2, 10000.00);
+INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `unit_price`, `selected_color`) VALUES
+(1, 1, 1, 2, 10000.00, '#FF0000');
 
 -- --------------------------------------------------------
 
@@ -142,6 +147,8 @@ CREATE TABLE `products` (
   `description_en` text DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
   `image_url` varchar(500) DEFAULT NULL,
+  `extra_images` text DEFAULT NULL COMMENT 'JSON array of extra image filenames',
+  `colors` text DEFAULT NULL COMMENT 'JSON array of hex color strings (legacy)',
   `category_id` int(11) NOT NULL,
   `stock_quantity` int(11) DEFAULT 0,
   `is_active` tinyint(1) DEFAULT 1,
@@ -152,8 +159,30 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name_ar`, `name_fr`, `name_en`, `description_ar`, `description_fr`, `description_en`, `price`, `image_url`, `category_id`, `stock_quantity`, `is_active`, `created_at`) VALUES
-(1, 'nokia', '', 'nokia', 'dadadda', NULL, 'adadada', 10000.00, '69e495c9a6492.jpg', 1, 97, 1, '2026-04-19 08:43:53');
+INSERT INTO `products` (`id`, `name_ar`, `name_fr`, `name_en`, `description_ar`, `description_fr`, `description_en`, `price`, `image_url`, `extra_images`, `colors`, `category_id`, `stock_quantity`, `is_active`, `created_at`) VALUES
+(1, 'nokia', '', 'nokia', 'dadadda', '', 'adadada', 10000.00, 'assets/uploads/img_6a30569fa6259.jpg', NULL, '[\"#CC00CC\"]', 1, 97, 1, '2026-04-19 08:43:53');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_colors`
+--
+
+CREATE TABLE `product_colors` (
+  `id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `color_hex` varchar(9) NOT NULL COMMENT 'e.g. #FF0000',
+  `color_label` varchar(80) DEFAULT NULL COMMENT 'Optional human label',
+  `stock_quantity` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `product_colors`
+--
+
+INSERT INTO `product_colors` (`id`, `product_id`, `color_hex`, `color_label`, `stock_quantity`, `created_at`) VALUES
+(1, 1, '#CC00CC', '', 2, '2026-06-15 19:47:04');
 
 -- --------------------------------------------------------
 
@@ -261,47 +290,6 @@ CREATE TABLE `warranty_rules` (
   `description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ================================================================
--- Migration: Add multi-image & per-color stock to products
--- Database: wise_technologie
--- ================================================================
-
--- 1. Add extra_images column (JSON array of filenames)
-ALTER TABLE `products`
-    ADD COLUMN `extra_images` TEXT DEFAULT NULL COMMENT 'JSON array of extra image filenames'
-    AFTER `image_url`;
-
--- 2. Add legacy colors column (kept for backwards compat – JSON hex array)
-ALTER TABLE `products`
-    ADD COLUMN `colors` TEXT DEFAULT NULL COMMENT 'JSON array of hex color strings (legacy)'
-    AFTER `extra_images`;
-
--- ================================================================
--- 3. New table: product_colors
---    One row per (product, color) with its own stock quantity.
---    When stock_quantity = 0 the color is considered OUT OF STOCK.
--- ================================================================
-CREATE TABLE `product_colors` (
-    `id`             INT(11)      NOT NULL AUTO_INCREMENT,
-    `product_id`     INT(11)      NOT NULL,
-    `color_hex`      VARCHAR(9)   NOT NULL COMMENT 'e.g. #FF0000',
-    `color_label`    VARCHAR(80)  DEFAULT NULL COMMENT 'Optional human label',
-    `stock_quantity` INT(11)      NOT NULL DEFAULT 0,
-    `created_at`     TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY `idx_product_id` (`product_id`),
-    CONSTRAINT `product_colors_ibfk_1`
-        FOREIGN KEY (`product_id`)
-        REFERENCES `products` (`id`)
-        ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ================================================================
--- Example: how a "red out-of-stock" entry looks
---   INSERT INTO product_colors (product_id, color_hex, color_label, stock_quantity)
---   VALUES (1, '#FF0000', 'Rouge', 0);
--- ================================================================
-
 --
 -- Indexes for dumped tables
 --
@@ -350,6 +338,13 @@ ALTER TABLE `products`
   ADD KEY `category_id` (`category_id`);
 
 --
+-- Indexes for table `product_colors`
+--
+ALTER TABLE `product_colors`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_product_id` (`product_id`);
+
+--
 -- Indexes for table `repairs`
 --
 ALTER TABLE `repairs`
@@ -392,7 +387,7 @@ ALTER TABLE `cart_items`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `orders`
@@ -416,6 +411,12 @@ ALTER TABLE `payment_methods`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `product_colors`
+--
+ALTER TABLE `product_colors`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
@@ -472,6 +473,12 @@ ALTER TABLE `order_items`
 --
 ALTER TABLE `products`
   ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `product_colors`
+--
+ALTER TABLE `product_colors`
+  ADD CONSTRAINT `product_colors_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `repairs`
